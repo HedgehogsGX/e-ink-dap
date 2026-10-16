@@ -1,0 +1,5 @@
+.pio/
+.pio.nosync/
+.vscode/
+.DS_Store
+bench_audio.nosync/
