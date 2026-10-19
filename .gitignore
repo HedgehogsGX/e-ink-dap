@@ -3,3 +3,7 @@
 .vscode/
 .DS_Store
 bench_audio.nosync/
+sample_music.nosync/
+__pycache__/
+sample_books.nosync/
+bench_reader.nosync/

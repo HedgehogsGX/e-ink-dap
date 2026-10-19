@@ -1,0 +1,8 @@
+{
+  "name": "Host computer (native unit tests)",
+  "url": "https://docs.platformio.org/en/latest/platforms/native.html",
+  "vendor": "none",
+  "platforms": ["native"],
+  "frameworks": [],
+  "upload": {"maximum_size": 0, "maximum_ram_size": 0}
+}
