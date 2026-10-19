@@ -16,6 +16,7 @@ A pocket-sized portable music player (DAP) with an e-paper screen, inspired by a
 - Battery life target **20–40 h**, 4000 mAh LiPo
 - Size target: **~2/3 the length of an iPhone 15 (~98 mm)**
 - Touch e-paper for browsing; physical buttons for play/volume
+- More than a music player: a **home screen** opens the utilities — **Music**, **Reader** (an e-ink version of the owner's iOS reader ImmerseRead) and **Settings** — with room for more (§4.6)
 - Budget ~¥1,300 total. Parts from Taobao / Tmall / JD; PCB + SMT from JLCPCB (嘉立创)
 - Owner is a beginner in electronics, lives in Japan, buys from mainland China via 集运 (consolidated shipping)
 
@@ -95,8 +96,23 @@ A pocket-sized portable music player (DAP) with an e-paper screen, inspired by a
    | `player` | PASS. Two-core skeleton: play/pause, volume, next/prev, auto-advance, 44.1→48→96 kHz switching, 0 underruns with the control core blocked 1.5 s per simulated full refresh. `stall 200` produces underruns, so the counter works. |
    | `bringup_sd`, `bringup_touch` | Fail cleanly with wiring hints when nothing is attached (expected). |
    | `bringup_epd`, `bringup_dac`, `bringup_buttons` | Built, not run (need the parts). |
+   | `reader_bench` (2026-10-19) | PASS. The made-up 450 KB Chinese novel (`tools/make_reader_bench.sh`), 18 px font with 7,108 glyphs, text and font in PSRAM, default reader settings (212 × 368 px text, 27 px lines): whole book 1,097 pages in 767 ms (17.7 ms per 10 KB); slowest 64 KB section 112 ms; next page 1.4 ms to lay out + 5.4 ms to draw into a 1-bit buffer; font size change and back 54 ms. Kinsoku and hanging punctuation as on the host. |
+   | `pio test -e native` (2026-10-19) | PASS, 78 tests (31 before + 47 for the reader, fonts, settings and navigation). |
 
    Note: the ESP32-S3 has no audio PLL, so MCLK comes from a fractional divider. The average rate is exact, but jitter was not measured — one more reason not to judge final sound on the prototype.
+5. ✅ **RESOLVED 2026-10-19 — portrait, 240×416.** The player is held upright like an iPod; the panel's native orientation, so `setRotation(0)` (or 2 if the case mounts the panel upside down). The UI follows the `*_portrait.png` mockups in `docs/previews/`: art on top with track info under it, 9 list rows, 2 past + 3 coming lyric lines. Still open for the case design: the mockups put the 4 buttons below the screen; side buttons are the alternative.
+   - `bringup_epd` still draws in landscape (`setRotation(1)`). That's fine for the bring-up test; the player code uses portrait.
+   - History: landscape (416×240, art and track info side by side, 5 list rows) was mocked up too; both are compared in `docs/previews/orientations.jpg` (2026-10-17).
+
+6. ✅ **RESOLVED 2026-10-19 — Home screen and apps: Music, Reader, Settings.** Mockups: `docs/previews/overview_apps_x2.png` (captioned) and `eink_look_apps.jpg`.
+   - **Home**: one card per app, showing what is playing and the book you are in. Black and white only, so moving between home and the apps uses fast partial refreshes. Music keeps playing in every app.
+   - **Getting home**: tap the status bar (it starts with a home icon on every app screen), or hold Lock. A book page has no status bar: tap its middle for the reader menu. Each app reopens where you left it (`lib/ui_nav`).
+   - **Buttons**: Play short = play/pause, hold = next song; Vol± short = volume, hold = next/previous song; Lock short = lock, hold = home. With "Volume keys turn pages" on (off by default, so the volume buttons always mean volume with the sensitive IEMs), on a book page Vol− = next page, Vol+ = previous, holding = volume.
+   - **Reader** follows ImmerseRead (`.../Code/Project/ImmersiveReader`): same formats (EPUB, PDF text layer, TXT/Markdown, DOCX; legacy DOC and scanned PDFs not), positions stored as text offsets so a font change keeps your place, font size / line spacing / margins, contents and bookmarks, covers with a lettered fallback, the book you are in on top of the shelf. Not carried over: scrolling mode (pages only on e-paper), search (no keyboard), editing covers and titles (done on the PC), sepia (white-on-black instead).
+   - **Conversion happens on the PC** (decided 2026-10-19): `build_index.py` also converts `/Books` into one simple pre-parsed format and bakes bitmap fonts with exactly the characters used. The ESP32 only lays out and draws. Formats in `docs/formats.md`.
+   - **Page turns**: tap the left/right third of a page (or the volume keys, see above). Full refresh every 10 page turns by default (setting).
+   - **Settings**: Music (start volume, volume limit, resume, repeat, shuffle, lyric translations), Reader (font size 14–32 px, line spacing, margins, indent, justify, volume keys), Display (full refresh interval, white on black, upside down), System (auto-lock, sleep, language), About, storage. Saved as `/.dap/settings.ini`.
+   - Still open: whether the UI is translated (the language setting exists; strings are English so far), and the reader's default font (Hiragino Sans GB from macOS; any OFL CJK font can be given to `tools/fonts.py`).
 
 ---
 
@@ -136,12 +152,12 @@ Touch chat recommended only 4 physical buttons (play/pause, vol+, vol−, lock) 
 **Uploading and serial** — the board is used on its native **USB** port (not "UART"); `Serial` goes over that port.
 - `pio run -e <env> -t upload`, then `pio device monitor`. Uploads end with a watchdog reset because an RTS reset on this port drops into download mode (`waiting for download`).
 - Boot output is printed before the monitor opens. Each test re-prints on its own or when you type `r`; the player takes `h` for help.
-- Envs: `selftest`, `i2s_clocks`, `decode_bench` (first run `tools/make_bench_clips.sh`, then `-t uploadfs`), `player`, and `bringup_epd` / `bringup_sd` / `bringup_dac` / `bringup_buttons` / `bringup_touch`.
+- Envs: `selftest`, `i2s_clocks`, `decode_bench` (first run `tools/make_bench_clips.sh`, then `-t uploadfs`), `reader_bench` (first run `tools/make_reader_bench.sh`), `player`, and `bringup_epd` / `bringup_sd` / `bringup_dac` / `bringup_buttons` / `bringup_touch`. `native` runs the host unit tests: `pio test -e native` (no board).
 
 Original plan, for reference: Arduino IDE with `ESP32S3 Dev Module`, Flash **16 MB**, PSRAM **OPI PSRAM** (wrong setting → boot loops), upload via the UART USB-C port.
 
 **Libraries**
-- **GxEPD2** — e-paper (partial refresh, 4-level grayscale)
+- **GxEPD2** — e-paper (partial refresh). Its GDEY037T03 driver is black/white only; 4-gray art needs another driver (see `docs/formats.md`)
 - **SD_MMC** with `SD_MMC.setPins()` — 4-bit mode
 - **ESP32-audioI2S** — MP3/FLAC/WAV decode → I2S (16–48 kHz; **MCLK output must be enabled** for the CS4398). DAC bring-up only, see §4.2
 - **dr_flac / dr_mp3** (dr_libs, public domain) — candidate decoders for the player's own engine, benchmarked in §4.2
@@ -154,13 +170,28 @@ Original plan, for reference: Arduino IDE with `ESP32S3 Dev Module`, Flash **16 
 3. SD: list files from FAT32 card
 4. DAC: WAV → MP3 → FLAC. Low volume, IEMs **not in ears** on first test
 5. Buttons / touch
-6. Merge into one player
+6. Merge into one firmware: home screen + Music, Reader, Settings (§4.6)
 
 **Architecture notes from earlier chats**
 - Split cores: **audio decode on one core, UI/e-ink on the other** — a full e-ink refresh can block SPI for hundreds of ms.
 - Build a **library index file** on the SD (title/artist/album/path) instead of scanning thousands of files on every boot.
 - `.lrc` parser for synced lyrics; pre-convert album art on the PC into small dithered 4-gray bitmaps.
 - Use partial refresh for progress bar/lyrics; periodic full refresh to clear ghosting.
+
+**Host-side pieces (2026-10-16, no hardware needed)** — file formats in `docs/formats.md`
+- Library index `/.dap/library.idx`: `uv run tools/build_index.py /Volumes/<card>` reads tags (FLAC/MP3/WAV) and also writes the album covers; `--dump` prints an index. Firmware reader: `lib/library_index` (load the file into PSRAM, ~150–200 bytes per track).
+- Album art `/.dap/art/*.g4`: 4 grays, 2 bits per pixel, 200×200 = 10 KB. `tools/cover_art.py` converts one image; `lib/g4image` draws it.
+- Lyrics: `lib/lyrics` parses UTF-8 `.lrc` files next to the song (several time tags per line, `[offset:]`, translation lines kept under the original). The builder lists `.lrc` files that aren't UTF-8.
+- UI mockups of now playing, lyrics and library in `docs/previews/` (`tools/render_previews.py`). **Portrait (240×416) is the chosen orientation** (§4.5): `*_portrait.png`, `eink_look_portrait.jpg`. The landscape versions and `orientations.jpg` (both side by side) stay for comparison. Text is pure black/white (partial refresh); only cover art uses grays.
+- Tests: `pio test -e native`, 78 pass. `boards/host.json` only exists so the native env can sit next to the ESP32 `[env]` defaults. `tools/make_sample_library.sh` makes made-up test music.
+- Python tools run with `uv run` (installs what they need), or `pip install mutagen pillow pypdfium2 mammoth charset-normalizer fonttools` + `python3`.
+
+**Reader, settings and home screen (2026-10-19, host-side, no screen needed)** — §4.6, formats in `docs/formats.md`
+- Books: put them in `/Books` on the card; `build_index.py` runs `tools/books.py` (EPUB/PDF/TXT/MD/DOCX → `/.dap/books/<id>.dbk` + 72×96 cover, shelf index `/.dap/books.idx`; unchanged books are skipped) and `tools/fonts.py` (bitmap fonts `/.dap/fonts/`, reader 14–32 px + UI sizes, only the characters used). `--dump` prints a book or the shelf; `tools/make_sample_books.py` makes made-up books in every format.
+- Firmware libraries (plain C++, tested on the host): `lib/text_layout` (line breaking with kinsoku, hanging 、。，, justification, pages per section), `lib/bitmap_font` (.dfn fonts), `lib/book` (book + shelf readers; a book opens from its first few KB, text is read one ≤64 KB section at a time), `lib/reader` (`ReaderSession`: page turns, chapters, font changes keep your place; `ReadingState`: positions, bookmarks, recently read in `/.dap/reading.txt`), `lib/settings` (one table drives the ini file and the Settings screens), `lib/ui_nav` (home/app navigation, what buttons and taps do). `lib/dapfile` has the shared byte/CRC/UTF-8 helpers.
+- Mockups: home, shelf, page, reader menu, contents, settings, settings › reader in `docs/previews/` (`home.png` …, `overview_apps_x2.png`). Portrait music screens now start their status bar with the home icon.
+- Not done yet (needs the screen): drawing these screens on the panel, touch handling, and the merged firmware (bring-up step 6).
+- To check during the e-paper bring-up: can this panel show 4 grays with an available driver, and does a black/white partial refresh leave grays outside its window alone? Also: how the 1-bit reader fonts look at 18 px on the real panel, and how long a page-turn partial refresh takes.
 
 ---
 
