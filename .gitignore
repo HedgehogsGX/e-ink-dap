@@ -7,3 +7,8 @@ sample_music.nosync/
 __pycache__/
 sample_books.nosync/
 bench_reader.nosync/
+
+# Notes for AI agents stay local
+AGENTS.md
+CLAUDE.md
+PROJECT.md
