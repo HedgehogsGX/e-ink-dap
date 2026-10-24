@@ -28,19 +28,21 @@ constexpr int PIN_BOARD_LED = -1;
 constexpr int PIN_FREE_38_48 = -1;
 #endif
 
-// E-paper, SPI (10/11/12 are the FSPI IO_MUX pins)
-constexpr int PIN_EPD_CS   = 10;
-constexpr int PIN_EPD_MOSI = 11;  // FTS02 "SDI"/"MOSI"
-constexpr int PIN_EPD_SCK  = 12;
-constexpr int PIN_EPD_DC   = 9;
-constexpr int PIN_EPD_RST  = 8;
-constexpr int PIN_EPD_BUSY = 13;  // UC8253: 0 = busy, 1 = idle
+// E-paper, SPI (10/11/12 are the FSPI IO_MUX pins). Comments give the pin on the
+// FTS02's Raspberry Pi socket (FTS02 schematic 20250819). Power: socket pin 1 = 3V3,
+// pin 6 = GND. Socket pins 2/4 (5 V) stay empty: the panel and touch run on 3.3 V.
+constexpr int PIN_EPD_CS   = 10;  // socket 24 "CS"
+constexpr int PIN_EPD_MOSI = 11;  // socket 19 "SPI_MOSI"
+constexpr int PIN_EPD_SCK  = 12;  // socket 23 "SPI_SCK"
+constexpr int PIN_EPD_DC   = 9;   // socket 22 "D/C"
+constexpr int PIN_EPD_RST  = 8;   // socket 11 "RES"
+constexpr int PIN_EPD_BUSY = 13;  // socket 18 "BUSY". UC8253: 0 = busy, 1 = idle
 
-// Touch, FT6336U on I2C (address 0x38)
-constexpr int PIN_TOUCH_SDA = 6;
-constexpr int PIN_TOUCH_SCL = 7;
-constexpr int PIN_TOUCH_INT = 47;
-constexpr int PIN_TOUCH_RST = PIN_FREE_38_48;  // set DEVKITC_REV before the touch test
+// Touch, FT6336U on I2C (address 0x38), touch cable in the FTS02's TP-FPC2
+constexpr int PIN_TOUCH_SDA = 6;   // socket 33 "TP_SDA"
+constexpr int PIN_TOUCH_SCL = 7;   // socket 31 "TP_SCL"
+constexpr int PIN_TOUCH_INT = 47;  // socket 35 "TP_INT"
+constexpr int PIN_TOUCH_RST = PIN_FREE_38_48;  // socket 37 "TP_RST"; set DEVKITC_REV before the touch test
 
 // microSD, 4-bit SDMMC. 10 kΩ pull-ups to 3.3 V on CMD and D0-D3, not on CLK.
 constexpr int PIN_SD_CLK = 14;
