@@ -15,7 +15,7 @@ static NamedButton buttons[] = {
     {"Play", Button(PIN_BTN_PLAY)},
     {"Vol+", Button(PIN_BTN_VOL_UP)},
     {"Vol-", Button(PIN_BTN_VOL_DOWN)},
-    {"Lock", Button(PIN_BTN_LOCK)},
+    {"Power", Button(PIN_BTN_POWER)},
 };
 
 void setup() {

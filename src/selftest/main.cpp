@@ -80,7 +80,7 @@ static const NamedPin kPins[] = {
     {"SD_D1", PIN_SD_D1},         {"SD_D2", PIN_SD_D2},           {"SD_D3", PIN_SD_D3},
     {"I2S_MCK", PIN_I2S_MCK},     {"I2S_BCK", PIN_I2S_BCK},       {"I2S_LRCK", PIN_I2S_LRCK},
     {"I2S_DATA", PIN_I2S_DATA},   {"BTN_PLAY", PIN_BTN_PLAY},     {"BTN_VOL_UP", PIN_BTN_VOL_UP},
-    {"BTN_VOL_DOWN", PIN_BTN_VOL_DOWN}, {"BTN_LOCK", PIN_BTN_LOCK},
+    {"BTN_VOL_DOWN", PIN_BTN_VOL_DOWN}, {"BTN_POWER", PIN_BTN_POWER},
     {"GPIO38 (LED or TOUCH_RST)", 38}, {"GPIO48 (LED or TOUCH_RST)", 48},
 };
 
