@@ -62,4 +62,4 @@ constexpr int PIN_I2S_DATA = 5;
 constexpr int PIN_BTN_PLAY     = 39;
 constexpr int PIN_BTN_VOL_UP   = 40;
 constexpr int PIN_BTN_VOL_DOWN = 41;
-constexpr int PIN_BTN_LOCK     = 42;
+constexpr int PIN_BTN_POWER    = 42;

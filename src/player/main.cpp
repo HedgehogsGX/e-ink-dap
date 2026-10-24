@@ -6,7 +6,8 @@
 // Until the SD card is wired, the tracks are test tones at different sample rates.
 //
 // Buttons: BOOT or Play short = play/pause, long = next. Vol+/Vol- short = volume,
-// long = next/previous. Lock toggles the lock. Serial: type "h" for commands.
+// long = next/previous. Power toggles the lock (the bare board has nothing to switch
+// off). Serial: type "h" for commands.
 #include <Arduino.h>
 #include <esp_timer.h>
 
@@ -197,8 +198,8 @@ static Cmd fromButton(Press press, Cmd shortCmd, Cmd longCmd) {
 }
 
 static void controlTask(void*) {
-  Button boot(0), play(PIN_BTN_PLAY), volUp(PIN_BTN_VOL_UP), volDown(PIN_BTN_VOL_DOWN), lock(PIN_BTN_LOCK);
-  for (Button* b : {&boot, &play, &volUp, &volDown, &lock}) b->begin();
+  Button boot(0), play(PIN_BTN_PLAY), volUp(PIN_BTN_VOL_UP), volDown(PIN_BTN_VOL_DOWN), power(PIN_BTN_POWER);
+  for (Button* b : {&boot, &play, &volUp, &volDown, &power}) b->begin();
 
   delay(200);
   underrunsAtBoot = audioOut.underruns();  // I2S start-up, before any audio was due
@@ -214,7 +215,7 @@ static void controlTask(void*) {
     apply(fromButton(play.poll(now), Cmd::PlayPause, Cmd::Next));
     apply(fromButton(volUp.poll(now), Cmd::VolUp, Cmd::Next));
     apply(fromButton(volDown.poll(now), Cmd::VolDown, Cmd::Prev));
-    apply(fromButton(lock.poll(now), Cmd::Lock, Cmd::Lock));
+    apply(fromButton(power.poll(now), Cmd::Lock, Cmd::Lock));
 
     while (Serial.available()) {
       char c = Serial.read();

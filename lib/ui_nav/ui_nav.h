@@ -2,9 +2,9 @@
 // buttons and taps do on each screen. Plain C++17, no Arduino dependency.
 //
 // Each app keeps its own stack of screens, so going home and back to an app returns to
-// the screen you left: the page of your book, the song playing. From any screen, holding
-// Lock or tapping the status bar goes home; screens without a status bar (a book page)
-// have their menu instead.
+// the screen you left: the page of your book, the song playing. From any screen, tapping
+// the status bar goes home; screens without a status bar (a book page) have their menu
+// instead.
 #pragma once
 #include <cstdint>
 
@@ -48,11 +48,12 @@ class Navigator {
   uint8_t depth_[4] = {};
 };
 
-enum class Key : uint8_t { Play, VolUp, VolDown, Lock };
+enum class Key : uint8_t { Play, VolUp, VolDown, Power };
 enum class KeyPress : uint8_t { Short, Long };
 
 enum class Command : uint8_t {
-  None, PlayPause, NextTrack, PrevTrack, VolumeUp, VolumeDown, Lock, Unlock, Home, NextPage, PrevPage, Menu,
+  None, PlayPause, NextTrack, PrevTrack, VolumeUp, VolumeDown, Lock, Unlock, PowerOff, Home, NextPage,
+  PrevPage, Menu,
 };
 
 struct InputContext {
@@ -61,10 +62,11 @@ struct InputContext {
   bool volumeKeysTurnPages = false;  // Settings::volumeKeysTurnPages
 };
 
-// The four buttons. Play: short = play/pause, hold = next song. Vol+/Vol-: short = volume,
-// hold = next/previous song; on a book page with "volume keys turn pages", short turns
-// the page (Vol- forward) and hold changes the volume. Lock: short = lock/unlock, hold =
-// home. While locked, only a short Lock press does anything.
+// The four keys on the sides. Play: short = play/pause, hold = next song. Vol+/Vol-:
+// short = volume, hold = next/previous song; on a book page with "volume keys turn
+// pages", short turns the page (Vol- forward) and hold changes the volume. Power: short =
+// lock/unlock, hold = power off. While locked, only Power does anything, so the player can
+// be switched off without unlocking it, as on a phone.
 Command routeKey(Key key, KeyPress press, const InputContext& ctx);
 
 // A tap before the screen's own buttons see it: on a book page, the left third turns

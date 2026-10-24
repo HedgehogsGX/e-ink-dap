@@ -73,7 +73,8 @@ void Navigator::resetApp(App a) {
 
 Command routeKey(Key key, KeyPress press, const InputContext& ctx) {
   bool hold = press == KeyPress::Long;
-  if (ctx.locked) return key == Key::Lock && !hold ? Command::Unlock : Command::None;
+  if (key == Key::Power) return hold ? Command::PowerOff : ctx.locked ? Command::Unlock : Command::Lock;
+  if (ctx.locked) return Command::None;
   bool pages = ctx.screen == Screen::Page && ctx.volumeKeysTurnPages;
   switch (key) {
     case Key::Play: return hold ? Command::NextTrack : Command::PlayPause;
@@ -83,9 +84,7 @@ Command routeKey(Key key, KeyPress press, const InputContext& ctx) {
     case Key::VolDown:
       if (pages) return hold ? Command::VolumeDown : Command::NextPage;
       return hold ? Command::PrevTrack : Command::VolumeDown;
-    case Key::Lock:
-      if (!hold) return Command::Lock;
-      return ctx.screen == Screen::Home ? Command::None : Command::Home;
+    case Key::Power: break;  // handled above
   }
   return Command::None;
 }

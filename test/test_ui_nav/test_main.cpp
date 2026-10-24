@@ -70,10 +70,10 @@ static void test_keys() {
   TEST_ASSERT_EQUAL(Command::NextTrack, routeKey(Key::Play, KeyPress::Long, ctx));
   TEST_ASSERT_EQUAL(Command::VolumeUp, routeKey(Key::VolUp, KeyPress::Short, ctx));
   TEST_ASSERT_EQUAL(Command::PrevTrack, routeKey(Key::VolDown, KeyPress::Long, ctx));
-  TEST_ASSERT_EQUAL(Command::Lock, routeKey(Key::Lock, KeyPress::Short, ctx));
-  TEST_ASSERT_EQUAL(Command::Home, routeKey(Key::Lock, KeyPress::Long, ctx));
+  TEST_ASSERT_EQUAL(Command::Lock, routeKey(Key::Power, KeyPress::Short, ctx));
+  TEST_ASSERT_EQUAL(Command::PowerOff, routeKey(Key::Power, KeyPress::Long, ctx));
   ctx.screen = Screen::Home;
-  TEST_ASSERT_EQUAL(Command::None, routeKey(Key::Lock, KeyPress::Long, ctx));
+  TEST_ASSERT_EQUAL(Command::PowerOff, routeKey(Key::Power, KeyPress::Long, ctx));
 }
 
 static void test_volume_keys_turn_pages_only_when_asked_and_only_on_a_page() {
@@ -88,14 +88,15 @@ static void test_volume_keys_turn_pages_only_when_asked_and_only_on_a_page() {
   TEST_ASSERT_EQUAL(Command::VolumeDown, routeKey(Key::VolDown, KeyPress::Short, ctx));
 }
 
-static void test_locked_ignores_everything_but_unlock() {
+static void test_locked_ignores_everything_but_power() {
   InputContext ctx;
   ctx.screen = Screen::Page;
   ctx.locked = true;
   TEST_ASSERT_EQUAL(Command::None, routeKey(Key::Play, KeyPress::Short, ctx));
   TEST_ASSERT_EQUAL(Command::None, routeKey(Key::VolUp, KeyPress::Short, ctx));
-  TEST_ASSERT_EQUAL(Command::None, routeKey(Key::Lock, KeyPress::Long, ctx));
-  TEST_ASSERT_EQUAL(Command::Unlock, routeKey(Key::Lock, KeyPress::Short, ctx));
+  TEST_ASSERT_EQUAL(Command::None, routeKey(Key::VolDown, KeyPress::Long, ctx));
+  TEST_ASSERT_EQUAL(Command::Unlock, routeKey(Key::Power, KeyPress::Short, ctx));
+  TEST_ASSERT_EQUAL(Command::PowerOff, routeKey(Key::Power, KeyPress::Long, ctx));  // no unlock needed
   TEST_ASSERT_EQUAL(Command::None, routeTap(120, 200, ctx));
 }
 
@@ -121,7 +122,7 @@ int main() {
   RUN_TEST(test_screens_of_other_apps_are_not_pushed);
   RUN_TEST(test_keys);
   RUN_TEST(test_volume_keys_turn_pages_only_when_asked_and_only_on_a_page);
-  RUN_TEST(test_locked_ignores_everything_but_unlock);
+  RUN_TEST(test_locked_ignores_everything_but_power);
   RUN_TEST(test_taps);
   return UNITY_END();
 }
