@@ -1,0 +1,384 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1265" viewBox="0 0 1200 1265" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="600" y="36" font-size="24" fill="#222" text-anchor="middle" font-weight="bold">Phase 1 wiring map</text>
+<text x="600" y="58" font-size="12" fill="#777" text-anchor="middle" font-weight="normal">Made from include/pins.h by tools/make_wiring_diagram.py · guide: docs/phase1_assembly.md</text>
+<text x="600" y="100" font-size="18" fill="#222" text-anchor="middle" font-weight="bold">DevKitC-1 in the breadboard, seen from above</text>
+<text x="600" y="120" font-size="13" fill="#555" text-anchor="middle" font-weight="normal">USB ports point to the far end of the breadboard. Rows are counted from that end.</text>
+<rect x="555" y="126" width="30" height="18" rx="3" fill="#9aa0a6" stroke="#5f6368" stroke-width="1"/>
+<rect x="615" y="126" width="30" height="18" rx="3" fill="#9aa0a6" stroke="#5f6368" stroke-width="1"/>
+<rect x="510" y="140" width="180" height="705" rx="6" fill="#1d2127" stroke="none" stroke-width="1"/>
+<rect x="570" y="625" width="60" height="205" rx="4" fill="#c9ccd1" stroke="#8a8f96" stroke-width="1"/>
+<text x="600" y="733" font-size="12" fill="#333" text-anchor="middle" font-weight="normal">module</text>
+<text x="600" y="863" font-size="12" fill="#777" text-anchor="middle" font-weight="normal">antenna end</text>
+<text x="503" y="144" font-size="11" fill="#777" text-anchor="end" font-weight="normal">free hole</text>
+<text x="697" y="144" font-size="11" fill="#777" text-anchor="start" font-weight="normal">free hole</text>
+<text x="70" y="144" font-size="11" fill="#777" text-anchor="middle" font-weight="normal">row</text>
+<text x="435" y="144" font-size="13" fill="#333" text-anchor="end" font-weight="bold">LEFT side</text>
+<text x="765" y="144" font-size="13" fill="#333" text-anchor="start" font-weight="bold">RIGHT side</text>
+<text x="1130" y="144" font-size="11" fill="#777" text-anchor="middle" font-weight="normal">row</text>
+<rect x="519" y="164" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="174" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">G</text>
+<circle cx="495" cy="170" r="5" fill="#222222" stroke="#222222" stroke-width="1.5"/>
+<line x1="489" y1="170" x2="473" y2="170" stroke="#222222" stroke-width="2.5"/>
+<text x="467" y="174" font-size="13" fill="#222222" text-anchor="end" font-weight="normal">blue - rail (GND), over the USB end</text>
+<text x="70" y="174" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">1</text>
+<rect x="519" y="194" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="204" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">G</text>
+<circle cx="495" cy="200" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="204" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">2</text>
+<rect x="519" y="224" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="234" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">19</text>
+<circle cx="495" cy="230" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="234" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">3</text>
+<rect x="519" y="254" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="264" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">20</text>
+<circle cx="495" cy="260" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="264" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">4</text>
+<rect x="519" y="284" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="294" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">21</text>
+<circle cx="495" cy="290" r="5" fill="#14915a" stroke="#14915a" stroke-width="1.5"/>
+<line x1="489" y1="290" x2="473" y2="290" stroke="#14915a" stroke-width="2.5"/>
+<text x="467" y="294" font-size="13" fill="#14915a" text-anchor="end" font-weight="normal">microSD D3  +10k</text>
+<text x="70" y="294" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">5</text>
+<rect x="519" y="314" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="324" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">47</text>
+<circle cx="495" cy="320" r="5" fill="#8b3fc8" stroke="#8b3fc8" stroke-width="1.5"/>
+<line x1="489" y1="320" x2="473" y2="320" stroke="#8b3fc8" stroke-width="2.5"/>
+<text x="467" y="324" font-size="13" fill="#8b3fc8" text-anchor="end" font-weight="normal">FTS02 socket 35 · TP_INT</text>
+<text x="70" y="324" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">6</text>
+<rect x="519" y="344" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="354" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">48</text>
+<circle cx="495" cy="350" r="5" fill="#8b3fc8" stroke="#8b3fc8" stroke-width="1.5"/>
+<line x1="489" y1="350" x2="473" y2="350" stroke="#8b3fc8" stroke-width="2.5"/>
+<text x="467" y="354" font-size="13" fill="#8b3fc8" text-anchor="end" font-weight="normal">FTS02 socket 37 · TP_RST</text>
+<text x="70" y="354" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">7</text>
+<rect x="519" y="374" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="384" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">45</text>
+<circle cx="495" cy="380" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="384" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">8</text>
+<rect x="519" y="404" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="414" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">0</text>
+<circle cx="495" cy="410" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="414" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">9</text>
+<rect x="519" y="434" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="444" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">35</text>
+<circle cx="495" cy="440" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="444" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">10</text>
+<rect x="519" y="464" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="474" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">36</text>
+<circle cx="495" cy="470" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="474" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">11</text>
+<rect x="519" y="494" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="504" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">37</text>
+<circle cx="495" cy="500" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="504" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">12</text>
+<rect x="519" y="524" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="534" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">38</text>
+<circle cx="495" cy="530" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="534" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">13</text>
+<rect x="519" y="554" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="564" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">39</text>
+<circle cx="495" cy="560" r="5" fill="#0f8b96" stroke="#0f8b96" stroke-width="1.5"/>
+<line x1="489" y1="560" x2="473" y2="560" stroke="#0f8b96" stroke-width="2.5"/>
+<text x="467" y="564" font-size="13" fill="#0f8b96" text-anchor="end" font-weight="normal">Play key</text>
+<text x="70" y="564" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">14</text>
+<rect x="519" y="584" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="594" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">40</text>
+<circle cx="495" cy="590" r="5" fill="#0f8b96" stroke="#0f8b96" stroke-width="1.5"/>
+<line x1="489" y1="590" x2="473" y2="590" stroke="#0f8b96" stroke-width="2.5"/>
+<text x="467" y="594" font-size="13" fill="#0f8b96" text-anchor="end" font-weight="normal">Vol+ key</text>
+<text x="70" y="594" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">15</text>
+<rect x="519" y="614" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="624" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">41</text>
+<circle cx="495" cy="620" r="5" fill="#0f8b96" stroke="#0f8b96" stroke-width="1.5"/>
+<line x1="489" y1="620" x2="473" y2="620" stroke="#0f8b96" stroke-width="2.5"/>
+<text x="467" y="624" font-size="13" fill="#0f8b96" text-anchor="end" font-weight="normal">Vol- key</text>
+<text x="70" y="624" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">16</text>
+<rect x="519" y="644" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="654" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">42</text>
+<circle cx="495" cy="650" r="5" fill="#0f8b96" stroke="#0f8b96" stroke-width="1.5"/>
+<line x1="489" y1="650" x2="473" y2="650" stroke="#0f8b96" stroke-width="2.5"/>
+<text x="467" y="654" font-size="13" fill="#0f8b96" text-anchor="end" font-weight="normal">Power key</text>
+<text x="70" y="654" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">17</text>
+<rect x="519" y="674" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="684" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">2</text>
+<circle cx="495" cy="680" r="5" fill="#e07000" stroke="#e07000" stroke-width="1.5"/>
+<line x1="489" y1="680" x2="473" y2="680" stroke="#e07000" stroke-width="2.5"/>
+<text x="467" y="684" font-size="13" fill="#e07000" text-anchor="end" font-weight="normal">DAC board BCK</text>
+<text x="70" y="684" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">18</text>
+<rect x="519" y="704" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="539" y="714" font-size="12" fill="#ffffff" text-anchor="start" font-weight="bold">1</text>
+<circle cx="495" cy="710" r="5" fill="#e07000" stroke="#e07000" stroke-width="1.5"/>
+<line x1="489" y1="710" x2="473" y2="710" stroke="#e07000" stroke-width="2.5"/>
+<text x="467" y="714" font-size="13" fill="#e07000" text-anchor="end" font-weight="normal">DAC board MCK</text>
+<text x="70" y="714" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">19</text>
+<rect x="519" y="734" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="744" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">RX</text>
+<circle cx="495" cy="740" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="744" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">20</text>
+<rect x="519" y="764" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="774" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">TX</text>
+<circle cx="495" cy="770" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="774" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">21</text>
+<rect x="519" y="794" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="539" y="804" font-size="12" fill="#9aa0a6" text-anchor="start" font-weight="normal">G</text>
+<circle cx="495" cy="800" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="70" y="804" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">22</text>
+<rect x="669" y="164" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="661" y="174" font-size="12" fill="#9aa0a6" text-anchor="end" font-weight="normal">G</text>
+<circle cx="705" cy="170" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="1130" y="174" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">1</text>
+<rect x="669" y="194" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="661" y="204" font-size="12" fill="#ffffff" text-anchor="end" font-weight="normal">5V</text>
+<circle cx="705" cy="200" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<line x1="711" y1="200" x2="727" y2="200" stroke="#d62828" stroke-width="2.5"/>
+<text x="733" y="204" font-size="13" fill="#d62828" text-anchor="start" font-weight="bold">5V: never connect anything</text>
+<text x="1130" y="204" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">2</text>
+<rect x="669" y="224" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="234" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">14</text>
+<circle cx="705" cy="230" r="5" fill="#14915a" stroke="#14915a" stroke-width="1.5"/>
+<line x1="711" y1="230" x2="727" y2="230" stroke="#14915a" stroke-width="2.5"/>
+<text x="733" y="234" font-size="13" fill="#14915a" text-anchor="start" font-weight="normal">microSD CLK</text>
+<text x="1130" y="234" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">3</text>
+<rect x="669" y="254" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="264" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">13</text>
+<circle cx="705" cy="260" r="5" fill="#1f6fd1" stroke="#1f6fd1" stroke-width="1.5"/>
+<line x1="711" y1="260" x2="727" y2="260" stroke="#1f6fd1" stroke-width="2.5"/>
+<text x="733" y="264" font-size="13" fill="#1f6fd1" text-anchor="start" font-weight="normal">FTS02 socket 18 · BUSY</text>
+<text x="1130" y="264" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">4</text>
+<rect x="669" y="284" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="294" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">12</text>
+<circle cx="705" cy="290" r="5" fill="#1f6fd1" stroke="#1f6fd1" stroke-width="1.5"/>
+<line x1="711" y1="290" x2="727" y2="290" stroke="#1f6fd1" stroke-width="2.5"/>
+<text x="733" y="294" font-size="13" fill="#1f6fd1" text-anchor="start" font-weight="normal">FTS02 socket 23 · SPI_SCK</text>
+<text x="1130" y="294" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">5</text>
+<rect x="669" y="314" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="324" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">11</text>
+<circle cx="705" cy="320" r="5" fill="#1f6fd1" stroke="#1f6fd1" stroke-width="1.5"/>
+<line x1="711" y1="320" x2="727" y2="320" stroke="#1f6fd1" stroke-width="2.5"/>
+<text x="733" y="324" font-size="13" fill="#1f6fd1" text-anchor="start" font-weight="normal">FTS02 socket 19 · SPI_MOSI</text>
+<text x="1130" y="324" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">6</text>
+<rect x="669" y="344" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="354" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">10</text>
+<circle cx="705" cy="350" r="5" fill="#1f6fd1" stroke="#1f6fd1" stroke-width="1.5"/>
+<line x1="711" y1="350" x2="727" y2="350" stroke="#1f6fd1" stroke-width="2.5"/>
+<text x="733" y="354" font-size="13" fill="#1f6fd1" text-anchor="start" font-weight="normal">FTS02 socket 24 · CS</text>
+<text x="1130" y="354" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">7</text>
+<rect x="669" y="374" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="384" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">9</text>
+<circle cx="705" cy="380" r="5" fill="#1f6fd1" stroke="#1f6fd1" stroke-width="1.5"/>
+<line x1="711" y1="380" x2="727" y2="380" stroke="#1f6fd1" stroke-width="2.5"/>
+<text x="733" y="384" font-size="13" fill="#1f6fd1" text-anchor="start" font-weight="normal">FTS02 socket 22 · D/C</text>
+<text x="1130" y="384" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">8</text>
+<rect x="669" y="404" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="661" y="414" font-size="12" fill="#9aa0a6" text-anchor="end" font-weight="normal">46</text>
+<circle cx="705" cy="410" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="1130" y="414" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">9</text>
+<rect x="669" y="434" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="661" y="444" font-size="12" fill="#9aa0a6" text-anchor="end" font-weight="normal">3</text>
+<circle cx="705" cy="440" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="1130" y="444" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">10</text>
+<rect x="669" y="464" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="474" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">8</text>
+<circle cx="705" cy="470" r="5" fill="#1f6fd1" stroke="#1f6fd1" stroke-width="1.5"/>
+<line x1="711" y1="470" x2="727" y2="470" stroke="#1f6fd1" stroke-width="2.5"/>
+<text x="733" y="474" font-size="13" fill="#1f6fd1" text-anchor="start" font-weight="normal">FTS02 socket 11 · RES</text>
+<text x="1130" y="474" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">11</text>
+<rect x="669" y="494" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="504" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">18</text>
+<circle cx="705" cy="500" r="5" fill="#14915a" stroke="#14915a" stroke-width="1.5"/>
+<line x1="711" y1="500" x2="727" y2="500" stroke="#14915a" stroke-width="2.5"/>
+<text x="733" y="504" font-size="13" fill="#14915a" text-anchor="start" font-weight="normal">microSD D2  +10k</text>
+<text x="1130" y="504" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">12</text>
+<rect x="669" y="524" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="534" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">17</text>
+<circle cx="705" cy="530" r="5" fill="#14915a" stroke="#14915a" stroke-width="1.5"/>
+<line x1="711" y1="530" x2="727" y2="530" stroke="#14915a" stroke-width="2.5"/>
+<text x="733" y="534" font-size="13" fill="#14915a" text-anchor="start" font-weight="normal">microSD D1  +10k</text>
+<text x="1130" y="534" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">13</text>
+<rect x="669" y="554" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="564" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">16</text>
+<circle cx="705" cy="560" r="5" fill="#14915a" stroke="#14915a" stroke-width="1.5"/>
+<line x1="711" y1="560" x2="727" y2="560" stroke="#14915a" stroke-width="2.5"/>
+<text x="733" y="564" font-size="13" fill="#14915a" text-anchor="start" font-weight="normal">microSD D0  +10k</text>
+<text x="1130" y="564" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">14</text>
+<rect x="669" y="584" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="594" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">15</text>
+<circle cx="705" cy="590" r="5" fill="#14915a" stroke="#14915a" stroke-width="1.5"/>
+<line x1="711" y1="590" x2="727" y2="590" stroke="#14915a" stroke-width="2.5"/>
+<text x="733" y="594" font-size="13" fill="#14915a" text-anchor="start" font-weight="normal">microSD CMD  +10k</text>
+<text x="1130" y="594" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">15</text>
+<rect x="669" y="614" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="624" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">7</text>
+<circle cx="705" cy="620" r="5" fill="#8b3fc8" stroke="#8b3fc8" stroke-width="1.5"/>
+<line x1="711" y1="620" x2="727" y2="620" stroke="#8b3fc8" stroke-width="2.5"/>
+<text x="733" y="624" font-size="13" fill="#8b3fc8" text-anchor="start" font-weight="normal">FTS02 socket 31 · TP_SCL</text>
+<text x="1130" y="624" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">16</text>
+<rect x="669" y="644" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="654" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">6</text>
+<circle cx="705" cy="650" r="5" fill="#8b3fc8" stroke="#8b3fc8" stroke-width="1.5"/>
+<line x1="711" y1="650" x2="727" y2="650" stroke="#8b3fc8" stroke-width="2.5"/>
+<text x="733" y="654" font-size="13" fill="#8b3fc8" text-anchor="start" font-weight="normal">FTS02 socket 33 · TP_SDA</text>
+<text x="1130" y="654" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">17</text>
+<rect x="669" y="674" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="684" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">5</text>
+<circle cx="705" cy="680" r="5" fill="#e07000" stroke="#e07000" stroke-width="1.5"/>
+<line x1="711" y1="680" x2="727" y2="680" stroke="#e07000" stroke-width="2.5"/>
+<text x="733" y="684" font-size="13" fill="#e07000" text-anchor="start" font-weight="normal">DAC board DATA</text>
+<text x="1130" y="684" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">18</text>
+<rect x="669" y="704" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="714" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">4</text>
+<circle cx="705" cy="710" r="5" fill="#e07000" stroke="#e07000" stroke-width="1.5"/>
+<line x1="711" y1="710" x2="727" y2="710" stroke="#e07000" stroke-width="2.5"/>
+<text x="733" y="714" font-size="13" fill="#e07000" text-anchor="start" font-weight="normal">DAC board LRCK</text>
+<text x="1130" y="714" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">19</text>
+<rect x="669" y="734" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="661" y="744" font-size="12" fill="#9aa0a6" text-anchor="end" font-weight="normal">RST</text>
+<circle cx="705" cy="740" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="1130" y="744" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">20</text>
+<rect x="669" y="764" width="12" height="12" rx="0" fill="#8d7a3c" stroke="none" stroke-width="1"/>
+<text x="661" y="774" font-size="12" fill="#9aa0a6" text-anchor="end" font-weight="normal">3V3</text>
+<circle cx="705" cy="770" r="5" fill="#ffffff" stroke="#c4c7cc" stroke-width="1.5"/>
+<text x="1130" y="774" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">21</text>
+<rect x="669" y="794" width="12" height="12" rx="0" fill="#d8b24a" stroke="none" stroke-width="1"/>
+<text x="661" y="804" font-size="12" fill="#ffffff" text-anchor="end" font-weight="bold">3V3</text>
+<circle cx="705" cy="800" r="5" fill="#d62828" stroke="#d62828" stroke-width="1.5"/>
+<line x1="711" y1="800" x2="727" y2="800" stroke="#d62828" stroke-width="2.5"/>
+<text x="733" y="804" font-size="13" fill="#d62828" text-anchor="start" font-weight="normal">red + rail (3.3 V)</text>
+<text x="1130" y="804" font-size="11" fill="#999" text-anchor="middle" font-weight="normal">22</text>
+<text x="600" y="895" font-size="18" fill="#222" text-anchor="middle" font-weight="bold">FTS02 2×20 socket, seen from the back of the FTS02</text>
+<text x="600" y="915" font-size="13" fill="#555" text-anchor="middle" font-weight="normal">Board face-down, socket edge towards you, “P1” at the right (as in your photo). Column n from the right holds pin 2n−1 (edge row) and 2n (inner row).</text>
+<rect x="70" y="975" width="1070" height="145" rx="6" fill="#1f4f9c" stroke="none" stroke-width="1"/>
+<rect x="103" y="1005" width="994" height="90" rx="3" fill="#15171a" stroke="none" stroke-width="1"/>
+<text x="95" y="1030" font-size="13" fill="#ffffff" text-anchor="end" font-weight="normal">40</text>
+<text x="95" y="1080" font-size="13" fill="#ffffff" text-anchor="end" font-weight="normal">39</text>
+<text x="1105" y="1030" font-size="13" fill="#ffffff" text-anchor="start" font-weight="normal">2</text>
+<text x="1105" y="1080" font-size="13" fill="#ffffff" text-anchor="start" font-weight="bold">P1</text>
+<text x="975" y="999" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">GND</text>
+<text x="600" y="1113" font-size="11" fill="#c9d6ee" text-anchor="middle" font-weight="normal">board edge (nearest you)</text>
+<rect x="1060" y="1060" width="30" height="30" rx="3" fill="#d62828" stroke="#55595f" stroke-width="1"/>
+<text x="1075" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">1</text>
+<text x="1075" y="1143" font-size="11" fill="#d62828" text-anchor="middle" font-weight="bold">3.3V</text>
+<text x="1075" y="1157" font-size="11" fill="#d62828" text-anchor="middle" font-weight="normal">red rail</text>
+<rect x="1060" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#d62828" stroke-width="2.5"/>
+<text x="1075" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">2</text>
+<text x="1075" y="947" font-size="11" fill="#d62828" text-anchor="middle" font-weight="bold">5V</text>
+<text x="1075" y="961" font-size="11" fill="#d62828" text-anchor="middle" font-weight="normal">empty!</text>
+<rect x="1010" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="1025" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">3</text>
+<rect x="1010" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#d62828" stroke-width="2.5"/>
+<text x="1025" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">4</text>
+<text x="1025" y="947" font-size="11" fill="#d62828" text-anchor="middle" font-weight="bold">5V</text>
+<text x="1025" y="961" font-size="11" fill="#d62828" text-anchor="middle" font-weight="normal">empty!</text>
+<rect x="960" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="975" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">5</text>
+<rect x="960" y="1010" width="30" height="30" rx="3" fill="#222222" stroke="#55595f" stroke-width="1"/>
+<text x="975" y="1029" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">6</text>
+<text x="975" y="947" font-size="11" fill="#222222" text-anchor="middle" font-weight="bold">GND</text>
+<text x="975" y="961" font-size="11" fill="#222222" text-anchor="middle" font-weight="normal">blue rail</text>
+<rect x="910" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="925" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">7</text>
+<rect x="910" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="925" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">8</text>
+<rect x="860" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="875" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">9</text>
+<rect x="860" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="875" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">10</text>
+<rect x="810" y="1060" width="30" height="30" rx="3" fill="#1f6fd1" stroke="#55595f" stroke-width="1"/>
+<text x="825" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">11</text>
+<text x="825" y="1143" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="bold">RES</text>
+<text x="825" y="1157" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="normal">GPIO8</text>
+<rect x="810" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="825" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">12</text>
+<rect x="760" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="775" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">13</text>
+<rect x="760" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="775" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">14</text>
+<rect x="710" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="725" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">15</text>
+<rect x="710" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="725" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">16</text>
+<rect x="660" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="675" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">17</text>
+<rect x="660" y="1010" width="30" height="30" rx="3" fill="#1f6fd1" stroke="#55595f" stroke-width="1"/>
+<text x="675" y="1029" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">18</text>
+<text x="675" y="947" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="bold">BUSY</text>
+<text x="675" y="961" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="normal">GPIO13</text>
+<rect x="610" y="1060" width="30" height="30" rx="3" fill="#1f6fd1" stroke="#55595f" stroke-width="1"/>
+<text x="625" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">19</text>
+<text x="625" y="1143" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="bold">SPI_MOSI</text>
+<text x="625" y="1157" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="normal">GPIO11</text>
+<rect x="610" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="625" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">20</text>
+<rect x="560" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="575" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">21</text>
+<rect x="560" y="1010" width="30" height="30" rx="3" fill="#1f6fd1" stroke="#55595f" stroke-width="1"/>
+<text x="575" y="1029" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">22</text>
+<text x="575" y="947" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="bold">D/C</text>
+<text x="575" y="961" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="normal">GPIO9</text>
+<rect x="510" y="1060" width="30" height="30" rx="3" fill="#1f6fd1" stroke="#55595f" stroke-width="1"/>
+<text x="525" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">23</text>
+<text x="525" y="1143" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="bold">SPI_SCK</text>
+<text x="525" y="1157" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="normal">GPIO12</text>
+<rect x="510" y="1010" width="30" height="30" rx="3" fill="#1f6fd1" stroke="#55595f" stroke-width="1"/>
+<text x="525" y="1029" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">24</text>
+<text x="525" y="947" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="bold">CS</text>
+<text x="525" y="961" font-size="11" fill="#1f6fd1" text-anchor="middle" font-weight="normal">GPIO10</text>
+<rect x="460" y="1060" width="30" height="30" rx="3" fill="#222222" stroke="#55595f" stroke-width="1"/>
+<text x="475" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">25</text>
+<text x="475" y="1143" font-size="11" fill="#222222" text-anchor="middle" font-weight="bold">GND</text>
+<text x="475" y="1157" font-size="11" fill="#222222" text-anchor="middle" font-weight="normal">blue rail</text>
+<rect x="460" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="475" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">26</text>
+<rect x="410" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="425" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">27</text>
+<rect x="410" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="425" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">28</text>
+<rect x="360" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="375" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">29</text>
+<rect x="360" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="375" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">30</text>
+<rect x="310" y="1060" width="30" height="30" rx="3" fill="#8b3fc8" stroke="#55595f" stroke-width="1"/>
+<text x="325" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">31</text>
+<text x="325" y="1143" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="bold">TP_SCL</text>
+<text x="325" y="1157" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="normal">GPIO7</text>
+<rect x="310" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="325" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">32</text>
+<rect x="260" y="1060" width="30" height="30" rx="3" fill="#8b3fc8" stroke="#55595f" stroke-width="1"/>
+<text x="275" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">33</text>
+<text x="275" y="1143" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="bold">TP_SDA</text>
+<text x="275" y="1157" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="normal">GPIO6</text>
+<rect x="260" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="275" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">34</text>
+<rect x="210" y="1060" width="30" height="30" rx="3" fill="#8b3fc8" stroke="#55595f" stroke-width="1"/>
+<text x="225" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">35</text>
+<text x="225" y="1143" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="bold">TP_INT</text>
+<text x="225" y="1157" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="normal">GPIO47</text>
+<rect x="210" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="225" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">36</text>
+<rect x="160" y="1060" width="30" height="30" rx="3" fill="#8b3fc8" stroke="#55595f" stroke-width="1"/>
+<text x="175" y="1079" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="normal">37</text>
+<text x="175" y="1143" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="bold">TP_RST</text>
+<text x="175" y="1157" font-size="11" fill="#8b3fc8" text-anchor="middle" font-weight="normal">GPIO48</text>
+<rect x="160" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="175" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">38</text>
+<rect x="110" y="1060" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="125" y="1079" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">39</text>
+<rect x="110" y="1010" width="30" height="30" rx="3" fill="#2a2d31" stroke="#55595f" stroke-width="1"/>
+<text x="125" y="1029" font-size="11" fill="#8a8f96" text-anchor="middle" font-weight="normal">40</text>
+<rect x="60" y="1194" width="14" height="14" rx="2" fill="#1f6fd1" stroke="none" stroke-width="1"/>
+<text x="80" y="1205" font-size="13" fill="#222" text-anchor="start" font-weight="normal">E-paper (FTS02 socket)</text>
+<rect x="248.4" y="1194" width="14" height="14" rx="2" fill="#8b3fc8" stroke="none" stroke-width="1"/>
+<text x="268.4" y="1205" font-size="13" fill="#222" text-anchor="start" font-weight="normal">Touch (FTS02 socket)</text>
+<rect x="422.4" y="1194" width="14" height="14" rx="2" fill="#14915a" stroke="none" stroke-width="1"/>
+<text x="442.4" y="1205" font-size="13" fill="#222" text-anchor="start" font-weight="normal">microSD breakout</text>
+<rect x="567.5999999999999" y="1194" width="14" height="14" rx="2" fill="#e07000" stroke="none" stroke-width="1"/>
+<text x="587.5999999999999" y="1205" font-size="13" fill="#222" text-anchor="start" font-weight="normal">DAC board</text>
+<rect x="662.3999999999999" y="1194" width="14" height="14" rx="2" fill="#0f8b96" stroke="none" stroke-width="1"/>
+<text x="682.3999999999999" y="1205" font-size="13" fill="#222" text-anchor="start" font-weight="normal">Keys</text>
+<rect x="721.1999999999998" y="1194" width="14" height="14" rx="2" fill="#d62828" stroke="none" stroke-width="1"/>
+<text x="741.1999999999998" y="1205" font-size="13" fill="#222" text-anchor="start" font-weight="normal">3.3 V (red + rail)</text>
+<rect x="880.7999999999998" y="1194" width="14" height="14" rx="2" fill="#222222" stroke="none" stroke-width="1"/>
+<text x="900.7999999999998" y="1205" font-size="13" fill="#222" text-anchor="start" font-weight="normal">GND (blue - rail)</text>
+<text x="600" y="1235" font-size="13" fill="#d62828" text-anchor="middle" font-weight="bold">Every hole not marked stays empty. Never connect the DevKitC's 5V pin or the socket's 5V pins (2, 4).</text>
+</svg>
