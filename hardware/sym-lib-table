@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "dap") (type "KiCad") (uri "${KIPRJMOD}/dap.kicad_sym") (options "") (descr "E-ink DAP parts"))
+)
