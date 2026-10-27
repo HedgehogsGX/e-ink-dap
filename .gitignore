@@ -7,8 +7,20 @@ sample_music.nosync/
 __pycache__/
 sample_books.nosync/
 bench_reader.nosync/
+ui_demo.nosync/
+ui_sim.nosync/
 
 # Notes for AI agents stay local
 AGENTS.md
 CLAUDE.md
 PROJECT.md
+
+# KiCad local files
+hardware/*-backups/
+hardware/*.kicad_prl
+hardware/fp-info-cache
+hardware/*.lck
+
+# Freerouting (downloaded, see tools/make_pcb.py)
+tools/freerouting.nosync/
+case/pcb.glb

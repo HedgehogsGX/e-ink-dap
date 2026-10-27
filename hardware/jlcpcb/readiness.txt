@@ -1,0 +1,35 @@
+NOT READY TO ORDER - the files are a draft
+
+Blocks ordering:
+  - 28 connections are not routed yet
+  - J3 (Touch FPC): stand-in footprint - touch FPC: Hirose FH12 outline, the part is a Jushuo AFC07-S06FCA-00 (C262553)
+  - J5 (microSD): stand-in footprint - microSD: Hirose DM3D outline, the part is a TF-01A (C91145)
+  - J6 (PJ-342): stand-in footprint - dap:Jack_3.5mm_PJ-342_standin
+  - J7 (4.4mm balanced): stand-in footprint - dap:Jack_4.4mm_standin
+  - 120 parts have no LCSC part number (JLCPCB's BOM tool can match them by value and footprint, but check each): C1, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C2 ...
+
+Still to confirm against the datasheets (docs/pcb_plan.md):
+  - oscillators: OE high = running, output high-impedance when off (they share MCLK)
+  - GL823K: VDD and VDDA tied together as its internal 3.3 V (Genesys reference design)
+  - 15 uF 0805 capacitors at the CS43131 FILT pins: pick a part, or use 22 uF
+  - jacks: the detect contact touches the tip when a plug is in
+
+Order settings:
+  - 4 layers, 1.2 mm thick, 60.8 x 105.8 mm (outline in the Gerbers)
+  - surface finish: ENIG (flat pads for the 0.4 mm-pitch QFNs)
+  - impedance control on, a JLCPCB 4-layer 1.2 mm stackup: USB pair 0.2 mm / 0.2 mm gap, about 90 ohm differential over layer 2 - check with JLCPCB's impedance calculator
+  - min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; the ESP32 footprint's thermal vias are 0.2 mm
+  - vias tented (covered with solder mask)
+  - assembly: top side only (the battery pads on the back carry no part)
+
+Not assembled by JLCPCB:
+  - J1: battery wires, soldered to the pads by hand
+  - J7: 4.4 mm jack: not in JLCPCB's library, soldered by hand
+  - TP1: test pad
+  - TP2: test pad
+  - NT1: net tie: copper only
+
+Files: dap-gerbers-DRAFT.zip (14 files: dap-B_Cu.gbl, dap-B_Mask.gbs, dap-B_Paste.gbp, dap-B_Silkscreen.gbo, dap-Edge_Cuts.gm1, dap-F_Cu.gtl, dap-F_Mask.gts, dap-F_Paste.gtp, dap-F_Silkscreen.gto, dap-In1_Cu.g1, dap-In2_Cu.g2, dap-NPTH.drl, dap-PTH.drl, dap-job.gbrjob),
+dap-bom.csv (58 lines), dap-cpl.csv (153 parts).
+In JLCPCB's placement preview, check each part's rotation: some library parts are
+drawn turned 90 or 180 degrees from KiCad's footprints.

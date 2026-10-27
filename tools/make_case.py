@@ -7,7 +7,10 @@ so far, and writes it into case/:
   "Reference parts" (to check the fit; they are not printed). 1 Blender unit = 1 mm.
 - case/stl/front_shell.stl, back_cover.stl, volume_key.stl (print 2), power_key.stl,
   play_key.stl: in mm, laid flat for printing.
-- case/renders/*.png: front, back, top edge (ports), left and right sides (keys), exploded.
+- case/renders/*.png: front, back, top edge (ports), left and right sides (keys), exploded;
+  with the real board (case/pcb.glb, written by tools/make_pcb.py) also inside: the board
+  through the clear shell, panel taken out. The real board is also checked for parts
+  reaching into the panel's layer.
 Add `-- --no-render` to skip the renders, `-- --preview` for quick small ones.
 
 Layout, portrait (front face = +Z, top edge = +Y, as the player is held):
@@ -43,6 +46,10 @@ OUT = os.path.join(ROOT, "case")
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 RENDER = "--no-render" not in ARGS
 PREVIEW = "--preview" in ARGS
+# The real board, exported by tools/make_pcb.py; without it (or with -- --dummy-board) the
+# board is the boxes below
+PCB_GLB = os.path.join(OUT, "pcb.glb")
+REAL_PCB = os.path.exists(PCB_GLB) and "--dummy-board" not in ARGS
 
 # ---- Parts (mm)
 PANEL_W, PANEL_L, PANEL_T = 53.00, 92.99, 1.48   # GDEY037T03-T02 with its touch film
@@ -392,6 +399,26 @@ def reference_parts(coll, mats, screen_image):
     add(slab("battery_606090", coll, BATT_W / 2, BATT_L / 2, 1.5, Z_BATT, Z_BATT + BATT_T,
              at=(0, BATT_Y), rb=0.8, rt=0.8), "battery", "battery")
 
+    if REAL_PCB:   # KiCad's model of the board: metres, centred on the board, underside at z = 0
+        before = set(bpy.data.objects)
+        bpy.ops.import_scene.gltf(filepath=PCB_GLB)
+        board = bpy.data.objects.new("pcb (tools/make_pcb.py)", None)
+        coll.objects.link(board)
+        for ob in set(bpy.data.objects) - before - {board}:
+            for c in ob.users_collection:
+                c.objects.unlink(ob)
+            coll.objects.link(ob)
+            if ob.parent is None:
+                ob.parent = board
+        bpy.context.view_layer.update()   # the importer may already have turned metres into scene mm
+        width = max((ob.matrix_world @ Vector(c)).x for ob in board.children_recursive if ob.type == "MESH"
+                    for c in ob.bound_box) * 2
+        board.scale = (1000,) * 3 if width < 1 else (1,) * 3
+        board.location = (0, 0, Z_PCB)
+        board["layer"] = "board"
+        parts.append(board)
+        return parts
+
     pcb = slab("pcb", coll, IX - GAP, IY - GAP, R_INNER - GAP, Z_PCB, Z_PARTS)
     notches = []
     for x, (w, h, d, nose) in ((X_35, JACK35), (X_44, JACK44), (X_USB, (USBC_W, USBC_H, USBC_D, 0))):
@@ -482,6 +509,20 @@ def fit_check(objs):
                 if v > 0.05:
                     clashes.append((a.name, b.name, v))
     return clashes
+
+
+def height_check(board):
+    """Parts of the real board under the panel that reach into its layer: (x, y, mm too tall)."""
+    bpy.context.view_layer.update()
+    out = []
+    for ob in board.children_recursive:
+        if ob.type != "MESH":
+            continue
+        lo, hi = world_bbox(ob)
+        under = lo[0] < PANEL_W / 2 and hi[0] > -PANEL_W / 2 and lo[1] < PANEL_TOP and hi[1] > PANEL_BOTTOM
+        if under and hi[2] > Z_PANEL + 0.01:
+            out.append(((lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, hi[2] - Z_PANEL))
+    return sorted(out, key=lambda t: -t[2])
 
 
 def mesh_report(ob):
@@ -610,11 +651,17 @@ def main():
         bad, vol = mesh_report(ob)
         print(f"case: {ob.name}: {len(ob.data.polygons)} faces, {bad} non-manifold edges, "
               f"{vol / 1000:.2f} cm3")
-    solids = [shell, cover, *keys.values()] + [p for p in parts if p.name != "screen"]
+    solids = [shell, cover, *keys.values()] + [p for p in parts if p.name != "screen" and p.type == "MESH"]
     clashes = fit_check(solids)
     for a, b, v in clashes:
         print(f"case: CLASH {a} / {b}: {v:.2f} mm3")
     print(f"case: fit check: {len(clashes)} clashes among {len(solids)} parts")
+    if REAL_PCB:
+        board = next(p for p in parts if p.type == "EMPTY")
+        tall = height_check(board)
+        print(f"case: real board from {os.path.relpath(PCB_GLB, ROOT)}: {len(tall)} parts reach into the panel's layer")
+        for x, y, over in tall[:10]:
+            print(f"case:   at x {x:.1f}, y {y:.1f}: {over:.2f} mm too tall")
 
     os.makedirs(os.path.join(OUT, "stl"), exist_ok=True)
     export_stl(shell, os.path.join(OUT, "stl", "front_shell.stl"), Matrix.Rotation(math.pi, 4, "Y"))
@@ -651,13 +698,20 @@ def main():
 
     os.makedirs(os.path.join(OUT, "renders"), exist_ok=True)
 
-    def render(name):
-        sc.camera = cams[name]
+    def render(name, cam=None):
+        sc.camera = cams[cam or name]
         sc.render.filepath = os.path.join(OUT, "renders", name + ".png")
         bpy.ops.render.render(write_still=True)
         print("case: rendered", sc.render.filepath)
 
     render("front")
+    if REAL_PCB:   # the board through the clear shell, the panel taken out
+        panel = [ob for ob in root.children if ob["layer"] == "panel"]
+        for ob in panel:
+            ob.hide_render = True
+        render("inside", "front")
+        for ob in panel:
+            ob.hide_render = False
     root.rotation_euler = (0, math.pi, 0)
     root.location = (0, 0, T)
     render("back")
