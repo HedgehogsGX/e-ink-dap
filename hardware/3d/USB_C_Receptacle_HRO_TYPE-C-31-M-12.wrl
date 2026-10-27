@@ -1,0 +1,23 @@
+#VRML V2.0 utf8
+Shape { appearance Appearance { material Material { diffuseColor 0.580 0.590 0.620 specularColor 0.25 0.25 0.25 shininess 0.4 } }
+  geometry IndexedFaceSet { creaseAngle 0.6 coord Coordinate { point [
+    -1.7598 1.4370 0.0000,
+    1.7598 1.4370 0.0000,
+    1.7598 -1.4370 0.0000,
+    -1.7598 -1.4370 0.0000,
+    -1.7598 1.4370 1.2835,
+    1.7598 1.4370 1.2835,
+    1.7598 -1.4370 1.2835,
+    -1.7598 -1.4370 1.2835 ] }
+  coordIndex [ 0, 1, 2, 3, -1, 7, 6, 5, 4, -1, 4, 5, 1, 0, -1, 5, 6, 2, 1, -1, 6, 7, 3, 2, -1, 7, 4, 0, 3, -1 ] } }
+Shape { appearance Appearance { material Material { diffuseColor 0.070 0.070 0.070 specularColor 0.25 0.25 0.25 shininess 0.4 } }
+  geometry IndexedFaceSet { creaseAngle 0.6 coord Coordinate { point [
+    -1.4173 -1.4252 0.1772,
+    1.4173 -1.4252 0.1772,
+    1.4173 -1.4409 0.1772,
+    -1.4173 -1.4409 0.1772,
+    -1.4173 -1.4252 1.1024,
+    1.4173 -1.4252 1.1024,
+    1.4173 -1.4409 1.1024,
+    -1.4173 -1.4409 1.1024 ] }
+  coordIndex [ 0, 1, 2, 3, -1, 7, 6, 5, 4, -1, 4, 5, 1, 0, -1, 5, 6, 2, 1, -1, 6, 7, 3, 2, -1, 7, 4, 0, 3, -1 ] } }
