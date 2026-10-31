@@ -411,7 +411,16 @@ anything blocks it, the zip is named `dap-gerbers-DRAFT.zip`.
   test pads and the net tie.
 - **Ready to order (2026-10-31):** nothing blocks it (`readiness.txt`: READY TO ORDER,
   `dap-gerbers.zip`). Before ordering: pre-order 4 CS43131 into the JLCPCB parts inventory
-  (none in stock), and check the touch ribbon's contact side. History: on 2026-10-27 the
+  (none in stock), and check the touch ribbon's contact side.
+- **Ordering through 嘉立创 (jlc-smt.com), JLC's site in China** (owner's choice, 2026-10-31):
+  it ships to the 集运 warehouse with the Taobao parcels. Its forms are in Chinese; the
+  steps, field by field with the English meaning, are at the end of `readiness.txt`. It reads
+  no KiCad files, so the assembly order takes `dap-bom-cn.csv` and `dap-cpl-cn.csv`, written
+  after its BOM rules (Comment, Designator, Footprint and the part number as 商品编号; plain
+  package names). Under 元器件备货方式 pick **嘉立创代采代购**: JLC buys every part,
+  including the CS43131 it doesn't stock; parts can also be bought ahead into its private
+  stock (私有库存). The board order (6 layers, 1.2 mm, 沉金 ENIG, 过孔盖油) goes in first,
+  on member.jlc.com, and the assembly order is attached to it. History: on 2026-10-27 the
   unrouted connections, stand-in footprints, missing LCSC numbers and open datasheet checks
   blocked it; all are done.
 - In JLCPCB's placement preview, check each part's rotation: some library parts are drawn

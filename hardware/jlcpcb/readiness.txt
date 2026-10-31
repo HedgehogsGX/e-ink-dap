@@ -5,7 +5,7 @@ Check before ordering, or when the boards arrive (docs/pcb_plan.md):
   - touch ribbon: with the display facing up, its gold contacts must face up as well (like the e-paper ribbon's), so they face the bottom-contact connector once folded under the panel
   - plug detect: the 3.5 mm jack's switch opens when a plug goes in, the 4.4 mm jack's is unknown - the firmware sets HPDETECT_INV for each after a try
 
-Order settings:
+Order settings (jlcpcb.com):
   - 6 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers); layer order top, ground, signal, signal, ground, bottom (the Gerbers' file names: F_Cu, In1_Cu ... In4_Cu, B_Cu)
   - surface finish: ENIG (flat pads for the 0.4 mm-pitch QFNs)
   - impedance control on, JLCPCB's 6-layer 1.2 mm stackup: USB pairs 0.2 mm / 0.2 mm gap on the top and bottom layers, about 90 ohm differential over the ground planes 0.1 mm away (layers 2 and 5) - check with JLCPCB's impedance calculator
@@ -13,6 +13,28 @@ Order settings:
   - plated slots 0.55 mm wide for the 4.4 mm jack, and one cut-out through the board under it
   - vias tented (covered with solder mask)
   - quantity 5 boards, 2 assembled (Economic assembly, top side only)
+
+Ordering on 嘉立创 (jlc-smt.com) instead, its forms in Chinese:
+  PCB下单 - board order (member.jlc.com, after logging in):
+    - 上传文件 upload: dap-gerbers.zip
+    - 板子层数 layers: 6
+    - 板子厚度 thickness: 1.2
+    - 板子数量 quantity: 5
+    - 外层铜厚 / 内层铜厚 copper outer / inner: 1oz / 0.5oz
+    - 焊盘喷镀 surface finish: 沉金 (ENIG)
+    - 阻焊覆盖 via covering: 过孔盖油 (tented)
+    - 阻抗 impedance: 需要 (yes): their 6-layer 1.2 mm stackup; USB pairs 0.2 mm tracks, 0.2 mm gap, outer layers, about 90 ohm - check it in their calculator
+    - 确认生产稿 confirm production files: 需要 (yes): you see their files before they start
+    - SMT贴片 assembly: 需要 (yes)
+    - 收货地址 delivery address: your 集运 warehouse in China
+  SMT下单 - assembly order (jlc-smt.com/order):
+    - 选择未发货PCB: the board order above
+    - BOM与坐标清单 -> 上传BOM和坐标: dap-bom-cn.csv and dap-cpl-cn.csv
+    - 元器件备货方式 how parts are supplied: 嘉立创代采代购 (JLC buys every part, CS43131 included)
+    - 贴片数量 boards assembled: 2
+    - 焊接层 sides: 只贴顶层 (top side only)
+    - 产品类型 type: 经济型 (economic)
+    - 匹配选型方式 part matching: 自助匹配选型 (every line has its 商品编号: check each one matched it, and that C965907, the CS43131, is bought for you)
 
 Not assembled by JLCPCB:
   - J1: battery wires, soldered to the pads on the back by hand
@@ -23,6 +45,6 @@ Not assembled by JLCPCB:
   - NT1: net tie: copper only
 
 Files: dap-gerbers.zip (16 files: dap-B_Cu.gbl, dap-B_Mask.gbs, dap-B_Paste.gbp, dap-B_Silkscreen.gbo, dap-Edge_Cuts.gm1, dap-F_Cu.gtl, dap-F_Mask.gts, dap-F_Paste.gtp, dap-F_Silkscreen.gto, dap-In1_Cu.g1, dap-In2_Cu.g2, dap-In3_Cu.g3, dap-In4_Cu.g4, dap-NPTH.drl, dap-PTH.drl, dap-job.gbrjob),
-dap-bom.csv (57 lines), dap-cpl.csv (151 parts).
+dap-bom.csv and dap-bom-cn.csv (57 lines), dap-cpl.csv and dap-cpl-cn.csv (151 parts).
 In JLCPCB's placement preview, check each part's rotation: some library parts are
 drawn turned 90 or 180 degrees from KiCad's footprints.

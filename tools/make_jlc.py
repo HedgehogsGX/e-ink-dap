@@ -10,7 +10,10 @@ Run tools/make_schematic.py and tools/make_pcb.py first.
   files. Named dap-gerbers-DRAFT.zip while anything below blocks ordering.
 - dap-bom.csv: JLCPCB's BOM columns (Comment, Designator, Footprint, LCSC Part #).
 - dap-cpl.csv: JLCPCB's placement columns (Designator, Mid X, Mid Y, Layer, Rotation).
-- readiness.txt: what still blocks ordering, and the order settings.
+- dap-bom-cn.csv, dap-cpl-cn.csv: the same for 嘉立创 (jlc-smt.com, JLC's site in China),
+  after its BOM rules: plain package names (0402, 0603 ...) and the part number as 商品编号;
+  the placement file also names each part. UTF-8 with a byte-order mark, for Excel.
+- readiness.txt: what still blocks ordering, and the order settings for both sites.
 
 Parts JLCPCB doesn't fit (NOT_ASSEMBLED) stay out of the BOM and placement files.
 """
@@ -18,6 +21,7 @@ import collections
 import csv
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -61,6 +65,32 @@ ORDER = ["6 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers); laye
          "plated slots 0.55 mm wide for the 4.4 mm jack, and one cut-out through the board under it",
          "vias tented (covered with solder mask)",
          "quantity 5 boards, 2 assembled (Economic assembly, top side only)"]
+# The same order on 嘉立创 (jlc-smt.com), whose forms are in Chinese: (step, [(field, choice)])
+ORDER_CN = [
+    ("PCB下单 - board order (member.jlc.com, after logging in)", [
+        ("上传文件 upload", "dap-gerbers.zip"),
+        ("板子层数 layers", "6"), ("板子厚度 thickness", "1.2"), ("板子数量 quantity", "5"),
+        ("外层铜厚 / 内层铜厚 copper outer / inner", "1oz / 0.5oz"),
+        ("焊盘喷镀 surface finish", "沉金 (ENIG)"), ("阻焊覆盖 via covering", "过孔盖油 (tented)"),
+        ("阻抗 impedance", "需要 (yes): their 6-layer 1.2 mm stackup; USB pairs 0.2 mm tracks, 0.2 mm gap, "
+                          "outer layers, about 90 ohm - check it in their calculator"),
+        ("确认生产稿 confirm production files", "需要 (yes): you see their files before they start"),
+        ("SMT贴片 assembly", "需要 (yes)"),
+        ("收货地址 delivery address", "your 集运 warehouse in China")]),
+    ("SMT下单 - assembly order (jlc-smt.com/order)", [
+        ("选择未发货PCB", "the board order above"),
+        ("BOM与坐标清单 -> 上传BOM和坐标", "dap-bom-cn.csv and dap-cpl-cn.csv"),
+        ("元器件备货方式 how parts are supplied", "嘉立创代采代购 (JLC buys every part, CS43131 included)"),
+        ("贴片数量 boards assembled", "2"), ("焊接层 sides", "只贴顶层 (top side only)"),
+        ("产品类型 type", "经济型 (economic)"),
+        ("匹配选型方式 part matching", "自助匹配选型 (every line has its 商品编号: check each one matched it, "
+                                    "and that C965907, the CS43131, is bought for you)")])]
+
+
+def package(footprint):
+    """嘉立创's BOM wants plain package names: R_0402_1005Metric -> 0402; other footprints as they are."""
+    m = re.match(r"(?:R|C|L|LED|D)_(\d{4})_", footprint)
+    return m.group(1) if m else footprint
 
 
 def run(*args):
@@ -171,14 +201,34 @@ def main():
                         "Top" if r["Side"].lower().startswith("top") else "Bottom", f"{float(r['Rot']):.1f}"])
     placed = sum(1 for r in rows if r["Ref"] not in NOT_ASSEMBLED)
 
+    # The same two files for 嘉立创, after its BOM rules
+    with open(os.path.join(OUT, "dap-bom-cn.csv"), "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.writer(f)
+        w.writerow(["Comment", "Designator", "Footprint", "商品编号"])
+        for (value, fp, lcsc), refs in groups.items():
+            w.writerow([value, ",".join(refs), package(fp), lcsc])
+    with open(os.path.join(OUT, "dap-cpl-cn.csv"), "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.writer(f)
+        w.writerow(["Designator", "Comment", "Footprint", "Mid X", "Mid Y", "Layer", "Rotation"])
+        for r in rows:
+            if r["Ref"] in NOT_ASSEMBLED:
+                continue
+            value, fp, _ = symbols[r["Ref"]]
+            w.writerow([r["Ref"], value, package(fp.split(":")[-1]), f"{float(r['PosX']):.4f}mm",
+                        f"{float(r['PosY']):.4f}mm", "Top" if r["Side"].lower().startswith("top") else "Bottom",
+                        f"{float(r['Rot']):.1f}"])
+
     lines = [("READY TO ORDER" if ready else "NOT READY TO ORDER - the files are a draft"), ""]
     if blockers:
         lines += ["Blocks ordering:"] + [f"  - {b}" for b in blockers] + [""]
     lines += ["Check before ordering, or when the boards arrive (docs/pcb_plan.md):"] + [f"  - {t}" for t in TO_CONFIRM]
-    lines += ["", "Order settings:"] + [f"  - {o}" for o in ORDER]
+    lines += ["", "Order settings (jlcpcb.com):"] + [f"  - {o}" for o in ORDER]
+    lines += ["", "Ordering on 嘉立创 (jlc-smt.com) instead, its forms in Chinese:"]
+    for step, fields in ORDER_CN:
+        lines += [f"  {step}:"] + [f"    - {k}: {v}" for k, v in fields]
     lines += ["", "Not assembled by JLCPCB:"] + [f"  - {r}: {why}" for r, why in NOT_ASSEMBLED.items()]
     lines += ["", f"Files: {os.path.basename(zip_path)} ({len(files)} files: {', '.join(files)}),",
-              f"dap-bom.csv ({len(groups)} lines), dap-cpl.csv ({placed} parts).",
+              f"dap-bom.csv and dap-bom-cn.csv ({len(groups)} lines), dap-cpl.csv and dap-cpl-cn.csv ({placed} parts).",
               "In JLCPCB's placement preview, check each part's rotation: some library parts are",
               "drawn turned 90 or 180 degrees from KiCad's footprints."]
     open(os.path.join(OUT, "readiness.txt"), "w").write("\n".join(lines) + "\n")
