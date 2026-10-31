@@ -7,13 +7,13 @@ are from JLCPCB's parts library on 2026-10-25.
 **Stage 2, the schematic, is drawn (2026-10-26):** see [Schematic](#schematic-stage-2) at the
 end. It follows this plan with the changes listed there.
 
-**Stage 3 (2026-10-31): every part has its real footprint and LCSC number, the board is
-60.8 × 111.8 mm (case 65 × 116 × 17.2 mm), DRC clean, but 32 connections are still
-unrouted** — the routers can't finish the audio area on 4 layers; see "Routing on 4 layers"
-at the end. Stage 4 files exist as a **draft, not ready to order**: see
-[JLCPCB files](#jlcpcb-files-stage-4-draft).
+**Stages 3 and 4 done (2026-10-31): the board is 6 layers, 60.8 × 111.8 mm (case 65 × 116
+× 17.2 mm), every part has its real footprint and LCSC number, every net is routed and
+KiCad's DRC is clean.** The JLCPCB files are ready to order: see
+[JLCPCB files](#jlcpcb-files-stage-4); what changed to get there is under "Routing on 6
+layers" at the end.
 
-One board, 4 layers, assembled by JLCPCB on **one side** (the side facing the screen), so it
+One board, 6 layers (4 until 2026-10-31), assembled by JLCPCB on **one side** (the side facing the screen), so it
 stays in their cheaper "Economic" assembly. Its outline comes from the case model
 (`tools/make_case.py`): 60.8 × 111.8 mm (since 2026-10-31), with a shallow notch for the
 4.4 mm jack and cut-outs for the two screw bosses.
@@ -191,9 +191,9 @@ roughly $40–75 per order on top of the parts, board and assembly.
 - **Middle:** ESP32 module, I2C/I2S level shifters. **Lower right:** charger, buck-boost and
   the optional 5 V boost. **Bottom:** the screen and touch connectors (the ribbons fold back
   at the panel's bottom edge), microSD socket, card reader and SD switch.
-- **Layers** (changed 2026-10-26, see Routing): 1 parts and signals (facing the screen),
-  2 and 3 solid ground, 4 signals and a 3.3 V fill under the battery side. Power runs as
-  wide tracks.
+- **Layers** (6 since 2026-10-31, see Routing): 1 parts and signals (facing the screen),
+  2 solid ground, 3 and 4 signals with ground poured around them, 5 solid ground, 6 signals
+  and a 3.3 V fill. Power runs as wide tracks.
 - **Height limit:** parts on the board must stay under 3.3 mm, the gap to the screen. The
   ESP32 module (3.1 mm) and the side switches (3.3 mm) are at the limit. The case script
   will check every part with its real height in stage 3.
@@ -265,7 +265,7 @@ editing the sheets in KiCad; a re-run overwrites them. Each run also checks itse
 
 ## Placement draft (stage 3)
 
-Placed 2026-10-26 in `hardware/dap.kicad_pcb`: all 158 parts on a 4-layer, 1.2 mm board
+Placed 2026-10-26 in `hardware/dap.kicad_pcb`: all 158 parts on a 1.2 mm board (4 layers then, 6 since 2026-10-31)
 cut to the case's outline (60.8 × 105.8 mm, jack notches, screw-boss corners). Routing is
 under way, see the next section. Renders: `hardware/renders/pcb_top.png`, `pcb_angle.png`, `pcb_bottom.png`;
 in KiCad, open the board and press Alt+3 (View → 3D Viewer) to turn it around.
@@ -275,7 +275,7 @@ Made by `tools/make_pcb.py` from the schematic's netlist, so run it after
 sit where its PLACE table puts them, following the layout idea above; each group's small
 parts are packed as close as they fit to the pins they connect to. It also writes the
 stand-in footprints (`hardware/dap.pretty`), simple 3D models for parts KiCad has none
-for (`hardware/3d`), and JLCPCB's 4-layer limits as design rules (`hardware/dap.kicad_dru`).
+for (`hardware/3d`), and JLCPCB's limits as design rules (`hardware/dap.kicad_dru`).
 DRC: no clearance, courtyard or edge problems, apart from the connections not routed yet
 and KiCad's own footprint for the side keys (its peg sits close to its pads).
 
@@ -296,35 +296,53 @@ The real FPC positions also depend on where the panel's and touch film's ribbons
 
 ## Routing (stage 3)
 
-Started 2026-10-26. `tools/make_pcb.py` routes in two steps, both part of the same script, so
-everything is redone whenever the schematic or the placement changes (a full run takes
-about 50 minutes):
+Started 2026-10-26, finished 2026-10-31. `tools/make_pcb.py` routes in three steps, all part
+of the same script, so everything is redone whenever the schematic or the placement changes
+(a full run takes about 20 minutes):
 
-1. **Its own small router** (`tools/pcb_router.py`) for ground, the short local nets (a chip
-   and its capacitors, feedback dividers: pins within 8 mm), then USB, audio and power, in
-   that order: 45° tracks on the top and bottom layers, through vias 0.5/0.3 mm, clearances
-   checked on a 0.025 mm grid. A connection it can't make gets up to three rounds of
-   rip-up and reroute (the nets routed within 2 mm of the stuck pins are taken up, the stuck
-   one goes first). Strips above and below each CS43131 are reserved channels: only its
+1. **Its own router** (`tools/pcb_router.py`) routes every net: 45° tracks on the four signal
+   layers (1, 3, 4 and 6; the USB pairs on 1 and 6 only), through vias 0.5/0.3 mm, clearances
+   checked on a 0.025 mm grid. First a via beside every ground pin and a short escape stub
+   out of every fine-pitch pin (chips, the two FPC connectors and every pin of the ESP32
+   module). Then each such pin gets **a via of its own** a short way out, taken round each
+   chip in turn so they stagger: first the pins of nets that leave their chip, then, where
+   room is left, the local nets' pins (a pin that finds no room has its local neighbours'
+   vias taken back, so they leave side by side on the top layer). A track routed early can
+   then never wall a pin in, which is what kept the 4-layer board from finishing. Then the
+   short local nets (a chip and its capacitors, feedback dividers: pins within 8 mm), USB,
+   audio, power and all other nets, in that order. Each search is A* **guided by the true
+   distance to its goal through free space** (Dijkstra over the search window, in SciPy), so
+   it goes straight round obstacles; before, long searches ran out of steps. Each net still
+   stuck then gets **a trial rip-up**: the nets routed near its pins are taken up, with their
+   pin vias there, it is routed first with a bigger search budget, then they are routed
+   again; the result is kept only if fewer connections are left unmade, otherwise everything
+   goes back exactly as it was. Rounds of this go on while they help. Pin vias left unused
+   are taken away. Strips above and below each CS43131 are reserved channels: only its
    headphone nets above, only its I2S, clock and I2C below.
 2. **Freerouting** (2.5.0, the Java version: `tools/freerouting.nosync/freerouting-2.5.0.jar`,
    downloaded from its GitHub release and checked against the published SHA-256, run with
-   its usage statistics off; not in git) for everything still unrouted: all tracks so far
-   are locked and handed over as fixed wiring, the inner layers as ground planes, and its
-   session is read back in. Then a clean-up: its neck-downs below 0.1 mm are widened to
-   0.1 mm, and dead-end tracks and vias (KiCad's own connectivity check) are removed. Without
-   the jar the script skips this step and leaves those nets unrouted.
+   its usage statistics off; not in git) for anything still unrouted, with all of ours as
+   fixed wiring (since 2026-10-31: allowed to redo ours, it undid more than it added). Skipped
+   when nothing is left, as now.
+3. **Clean-up and repair:** neck-downs below 0.1 mm are widened, dead-end tracks and vias
+   are removed one at a time, each removal kept only if KiCad's count of unrouted
+   connections stays the same (a track with one open end can still carry another that ends
+   partway along it). For each connection KiCad still finds open, our router then tries a
+   direct track between the two ends KiCad names, then the trial rip-up, each kept only if
+   KiCad's own count drops (`python tools/make_pcb.py --repair` runs only this step). On the
+   current board nothing is left for it.
 
-- **Ground:** solid planes on layers 2 and 3 under the whole board (none under the ESP32's
-  antenna). Every ground pin reaches them: a via beside the pin, vias inside the exposed
+- **Ground:** solid planes on layers 2 and 5 under the whole board (none under the ESP32's
+  antenna), and ground poured around the tracks on layers 3 and 4. Every ground pin reaches them: a via beside the pin, vias inside the exposed
   pads (4 under the charger), and the CS43131's ground pins tied into their own centre pad.
 - **USB, routed first** (the socket's pins leave no room to spare): D+/D− from the socket
-  through the ESD chip to the USB switch as a pair, 0.2 mm tracks 0.2 mm apart (about
-  90 Ω; check with JLCPCB's impedance calculator for the chosen stackup), then on to the
+  through the ESD chip to the USB switch as a pair, 0.2 mm tracks 0.2 mm apart, on the top
+  and bottom layers only (about 90 Ω over the ground plane 0.1 mm away; check with JLCPCB's
+  impedance calculator for the 6-layer stackup), then on to the
   card reader and the ESP32. The socket's two D− pins straddle a D+ pin, so they are
-  joined on the bottom layer. CC1/CC2 to the TUSB320L. Pair lengths: 69/74 mm to the switch
-  (5 mm apart: more than USB 2.0 guides like, to be matched by hand), 20/18 mm to the card
-  reader.
+  joined on the bottom layer. CC1/CC2 to the TUSB320L. Pair lengths: 70/75 mm to the switch
+  (4.5 mm apart, about 30 ps: more than USB 2.0 layout guides like, small next to a 2 ns
+  bit), 18/17 mm to the card reader, 9/11 mm to the ESP32.
 - **Audio:** master clock (kept 0.2 mm from other nets), the four headphone outputs
   (0.3 mm wide where there is room), headphone ground (0.5 mm) to both jacks and the net
   tie, jack detect, I2S on both sides of the level shifter, oscillator select.
@@ -332,15 +350,15 @@ about 50 minutes):
   the e-paper booster first, kept short; then each rail from its source as a tree of wide
   tracks: VBAT, SYS and VBUS 0.4–0.8 mm, 5 V 0.4–0.6 mm, 3.3 V and VP 0.3–0.5 mm, the 1.8 V
   rails 0.25–0.4 mm. Tracks narrow to 0.15 mm only where they leave a fine-pitch pin. On top
-  of its tracks, 3.3 V fills the free area of the bottom layer (about 5,100 mm²).
+  of its tracks, 3.3 V fills the free area of the bottom layer (about 5,600 mm²).
 - **Control and data lines** (I2C, keys, enable and reset lines, e-paper, microSD, charger
-  settings, battery sense): Freerouting, 0.15 mm tracks.
-- **Check (2026-10-27):** KiCad's DRC finds no clearance, width, edge or dangling-track
-  problems. **28 connections are still unrouted:** around the DACs the charge-pump
-  capacitors (9: DACL/DACR FLYP/FLYC/FLYN_VCP, DACR_VCPF_P), MCLK (2), OUT_LN (1), HP_GND (1),
-  OSC_SEL_N (1); control lines I2C_SCL/SDA (3 + 3), BOOST_EN (3), KEY_VOLUP (3), DAC_RST
-  (2), CHG_N (1). Freerouting routed VP's last pieces 0.11 mm wide (short, about 0.01 Ω;
-  widen when finishing).
+  settings, battery sense): last, 0.15–0.2 mm tracks.
+- **Check (2026-10-31):** every connection routed; KiCad's DRC finds no clearance, width,
+  edge, dangling or unconnected problems (the only reports are inside KiCad's own footprint
+  for the side keys, whose peg sits close to its pads, and four silkscreen notes at the
+  board edge). 395 vias, 3.5 m of track, nothing narrower than 0.15 mm. The side keys' two
+  pads "1" (joined inside the switch) are also joined by a track, as KiCad asks.
+  History: on 2026-10-27, on 4 layers, 28 connections were left.
 
 **Placement changes made for routing:** the CS43131s are turned 180° so their outputs face
 the jacks, strips above and below them are kept free of small parts, the stand-in
@@ -349,16 +367,18 @@ battery pads moved 2 mm towards the top edge to leave room for a ground via. Lat
 same day: small parts keep 0.8 mm beyond the outline of every chip with 0.5 mm pitch or
 finer (room for the tracks fanning out of its pins), each two-pad part is turned so its
 pads face the pins of their own nets, and a strip in front of the e-paper connector's
-signal pins (9-14) is kept free.
+signal pins (9-14) is kept free. On 2026-10-31: the ring kept free round each CS43131 is
+0.6 mm (was 1.4), parts that sit between two pins of their chip (the flying and filter
+capacitors) are placed first, right at those pins, and a strip in front of the
+charge-pump pins 22-26 is kept free for their tracks and vias.
 
 **Decided 2026-10-26: layer 3 is a second ground plane.** The long USB pair runs on the
 bottom layer, and high-speed USB needs ground on the layer next to it; the plan had layer 3
 for power. Power runs as wide tracks and the bottom layer's 3.3 V fill instead.
 
-**Next:** finish the 28 connections. The DAC areas are the hard part: each CS43131 needs
-14 capacitors and all its pins on two routing layers. Options: give each DAC more room
-(move parts apart), finish them by hand in KiCad, or a 6-layer board with two more
-routing layers (costs more at JLCPCB). Then match the USB pair's lengths.
+**Decided 2026-10-31: 6 layers** (owner's choice over dropping features): 1 top, 2 ground,
+3 and 4 signals, 5 ground, 6 bottom. Layer 2 is the top layer's reference, layer 5 the
+bottom's, so the USB pairs keep a solid ground beside them on either outer layer.
 
 ## Case with the real board
 
@@ -372,24 +392,24 @@ rebuilt each run). `tools/make_case.py` puts it into the case in place of the st
   than the case's hole (made for a mid-mount one), so the top-edge render shows an empty
   hole. Move the hole up in the case script, or find a mid-mount USB-C (open item 2).
 
-## JLCPCB files (stage 4, draft)
+## JLCPCB files (stage 4)
 
 `python3 tools/make_jlc.py` writes `hardware/jlcpcb/`: Gerbers and drill files in one zip,
 the BOM (`dap-bom.csv`, JLCPCB's columns) and the placement file (`dap-cpl.csv`), plus
 `readiness.txt`, which lists what still blocks ordering and the order settings. While
 anything blocks it, the zip is named `dap-gerbers-DRAFT.zip`.
 
-- **Order settings:** 4 layers, 1.2 mm, 60.8 × 105.8 mm; **ENIG** finish (flat pads for the
-  0.4 mm-pitch QFNs; HASL is too uneven for them); impedance control with a JLCPCB 4-layer
-  1.2 mm stackup for the USB pair; tracks/gaps 0.1 mm; vias 0.5/0.3 mm, tented; parts on
+- **Order settings:** 6 layers, 1.2 mm, 60.8 × 111.8 mm; **ENIG** finish (flat pads for the
+  0.4 mm-pitch QFNs; HASL is too uneven for them); impedance control with JLCPCB's 6-layer
+  1.2 mm stackup for the USB pairs; tracks/gaps 0.1 mm; vias 0.5/0.3 mm, tented; parts on
   the top side only.
 - **Not assembled by JLCPCB:** the 4.4 mm jack (hand-soldered), the battery wires, the
   test pads and the net tie.
-- **Blocks ordering (2026-10-27):** the 28 unrouted connections; stand-in footprints for
-  J3 (touch FPC: Hirose outline, the part is an AFC07-S06), J5 (microSD: Hirose outline, the
-  part is a TF-01A), J6 and J7 (jacks); 120 resistors and capacitors without LCSC part
-  numbers; and the datasheet checks listed under Schematic (oscillator enable, GL823K supply
-  pins, 15 µF capacitors, jack detect contacts).
+- **Ready to order (2026-10-31):** nothing blocks it (`readiness.txt`: READY TO ORDER,
+  `dap-gerbers.zip`). Before ordering: pre-order 4 CS43131 into the JLCPCB parts inventory
+  (none in stock), and check the touch ribbon's contact side. History: on 2026-10-27 the
+  unrouted connections, stand-in footprints, missing LCSC numbers and open datasheet checks
+  blocked it; all are done.
 - In JLCPCB's placement preview, check each part's rotation: some library parts are drawn
   turned 90° or 180° from KiCad's footprints.
 
@@ -472,3 +492,20 @@ the DACs, so shared buses and rails fan out both ways (now in place); and Freero
 allowed to rip up everything but the critical nets (32). Freerouting stops improving after
 about 7 passes and reports 87–129 "unfixable violations" in the locked copper, so it avoids
 whole areas. The board is DRC clean apart from the unrouted connections.
+
+**Routing on 6 layers (2026-10-31): finished.** The two extra layers alone didn't do it
+(27 left on the first try, the same places as on 4 layers), because the routers weren't
+short of room: they ran out of search steps, or a pin had been walled in. What finished it:
+- **The search is guided by the true distance** through free space (Dijkstra over its
+  window) instead of the straight line, so it goes round obstacles at once. Four long nets
+  that used to fail after a minute each now route in 4 seconds together.
+- **Pins get their own vias before routing** (chips, FPC connectors, the ESP32 module), so
+  no track routed earlier can wall a pin in; a pin with no room takes its neighbours'.
+- **Trial rip-ups that are undone unless they help**, and that may also move neighbouring
+  pins' vias; the old rip-up (always kept) went back and forth.
+- **DAC capacitors right at their pins**, see the placement changes above.
+- **Freerouting only adds**, with all our tracks fixed; allowed to redo ours, it lost more
+  than it made. On the current board it isn't needed at all.
+- **Clean-up that can't cut a connection**, and a pin via that a track on another layer
+  runs across counts as used (removing one had cut the charger's second SYS pin off).
+A full run now takes about 20 minutes.
