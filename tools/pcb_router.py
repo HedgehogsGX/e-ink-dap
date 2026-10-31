@@ -573,12 +573,14 @@ class Router:
         self._lay(net, path, 0.2, 0.3, d, win, None)
         return True
 
-    def drop_unused_stubs(self):
-        """Tidies the escape stubs: one that nothing of its net reached is removed; one
-        that a track joins partway along is cut back to that point, so no bit sticks out.
-        Returns how many were removed."""
+    def drop_unused_stubs(self, nets=None):
+        """Tidies the escape stubs (of these nets; all if None): one that nothing of its net
+        reached is removed; one that a track joins partway along is cut back to that point, so
+        no bit sticks out. Returns how many were removed."""
         dropped = 0
         for net, stub, tip, w in self.stubs:
+            if nets is not None and net not in nets:
+                continue
             s0, s1 = stub.GetStart(), stub.GetEnd()
             (ax, ay), (bx, by) = seg = ((pcbnew.ToMM(s0.x), pcbnew.ToMM(s0.y)), (pcbnew.ToMM(s1.x), pcbnew.ToMM(s1.y)))
             length = math.hypot(bx - ax, by - ay)

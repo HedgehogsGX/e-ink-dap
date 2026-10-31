@@ -19,19 +19,20 @@ Layout, portrait (front face = +Z, top edge = +Y, as the player is held):
   right. Each key is a
   printed slider held in by a flange inside the wall, pressing a side-push switch at the
   edge of the PCB.
-- Back layer: the 606090 battery under the panel. The jacks and USB-C sit in the top
-  ~15 mm, where the battery isn't, so the battery's 90 mm plus the 4.4 mm jack's depth set
-  the length (~110 mm).
-- Between them, one PCB, parts on the side facing the panel. The jacks and USB-C are
-  mid-mount (in notches in the board) so they line up on the case's centre line.
+- Back layer: the 806090 battery (5000 mAh) under the panel. Both headphone jacks hang
+  from the back of the board into the top ~21 mm, where the battery isn't: the 4.4 mm
+  jack's 18 mm body plus the battery's 90 mm set the length (116 mm).
+- Between them, one PCB, parts on the side facing the panel; USB-C sits on that side at
+  the top edge. Each port's hole is at its own part's height.
 - microSD slot in the bottom edge, right of centre (the panel's ribbons fold back at the
   centre).
 - Closing: the back cover hooks into the bottom wall and takes 2 M2 screws at the top
   corners, into heat-set inserts (M2, 3.2 mm hole) in the front shell.
 
-Panel numbers are Good Display's (GDEY037T03-T02 page and touch-sensor drawing). The jack,
-USB-C and microSD sizes are estimates: replace them with the drawings of the parts you buy,
-then re-run. The fit check at the end lists any parts that overlap.
+Panel numbers are Good Display's (GDEY037T03-T02 page and touch-sensor drawing); jack,
+USB-C and microSD sizes are from the chosen parts' drawings (docs/pcb_plan.md). The fit
+check at the end lists any parts that overlap; with the real board, the parts hanging under
+it are also checked against the battery.
 """
 import math
 import os
@@ -55,19 +56,20 @@ REAL_PCB = os.path.exists(PCB_GLB) and "--dummy-board" not in ARGS
 PANEL_W, PANEL_L, PANEL_T = 53.00, 92.99, 1.48   # GDEY037T03-T02 with its touch film
 AA_W, AA_L = 47.04, 81.54                        # active area
 AA_TOP = 2.98                                    # panel's top edge to the active area
-BATT_W, BATT_L, BATT_T = 60.0, 90.0, 6.0         # 606090 LiPo
+BATT_W, BATT_L, BATT_T = 60.0, 90.0, 8.0         # 806090 LiPo, 5000 mAh
 BATT_SWELL = 0.4                                 # room for the cell to swell
 PCB_T = 1.2
 PARTS_H = 3.3                                    # tallest part: ESP32-S3-WROOM-1 is 3.1
 SIDE_SW = (3.5, 6.0, 3.0)                        # side-push switch: depth, length, height (estimate)
-# Jacks: body width, body height, depth behind the wall, nose diameter. Estimates.
-JACK44 = (10.0, 9.0, 14.0, 7.5)
-JACK35 = (6.0, 5.0, 12.0, 5.0)
-USBC_W, USBC_H, USBC_D = 8.94, 3.26, 7.35        # 16-pin mid-mount receptacle
-SD_W, SD_D, SD_H = 14.0, 15.0, 1.85              # push-push microSD socket (estimate)
+# Headphone jacks, both hanging under the board: body width, body height, body depth, nose
+# diameter, nose length, axis below the board's underside. From the parts' drawings.
+JACK35 = (8.5, 4.5, 12.0, 5.0, 2.0, 2.25)        # SHOU HAN PJ-342
+JACK44 = (6.5, 5.0, 18.25, 6.0, 2.8, 2.5)        # Kinghelm KH-PJ-44002-12DBAP-A
+USBC_W, USBC_H, USBC_D = 8.94, 3.26, 7.35        # 16-pin top-mount receptacle (TYPE-C-31-M-12)
+SD_W, SD_D, SD_H = 14.0, 14.3, 1.8               # Hroparts TF-01A push-push microSD socket
 
 # ---- Case
-W, L = 65.0, 110.0          # outside width and length
+W, L = 65.0, 116.0          # outside width and length
 R_PLAN = 6.0                # corner radius, seen from the front
 R_FRONT, R_BACK = 2.5, 2.0  # rounding of the front and back edges
 WALL, FRONT, BACK = 1.8, 1.2, 1.4
@@ -81,8 +83,12 @@ Z_PARTS = Z_PCB + PCB_T
 Z_PANEL = Z_PARTS + PARTS_H
 Z_INNER = Z_PANEL + PANEL_T          # inside of the front face
 T = Z_INNER + FRONT
-Z_PORT = T / 2                       # jacks and USB-C on the centre line
 IX, IY = W / 2 - WALL, L / 2 - WALL  # inside half-width and half-length
+# Ports, each at its own part's height: the jacks under the board, USB-C on top of it. The
+# noses end 0.1-0.2 mm inside the case's face (tools/make_pcb.py places them so).
+FACE_35, FACE_44 = IY - GAP, L / 2 - 0.2 - JACK44[4]   # jacks' front faces
+Z_35, Z_44 = Z_PCB - JACK35[5], Z_PCB - JACK44[5]
+Z_USB = Z_PARTS + USBC_H / 2
 
 AA_Y = 0.0                           # window centred on the face
 PANEL_TOP = AA_Y + AA_L / 2 + AA_TOP
@@ -98,12 +104,14 @@ KEY_H, KEY_PROUD = 2.6, 0.6          # height, how far it stands out of the wall
 FLANGE_Y, FLANGE_Z, FLANGE_T = 0.8, 0.25, 0.8   # flange margins and thickness
 KEY_Z = Z_PARTS + 1.7                # flange clears the PCB, key lines up with the switch
 X_35, X_USB, X_44 = -15.0, 0.0, 15.0
-BATT_TOP = IY - max(JACK44[2], JACK35[2], USBC_D) - 0.5
+# 1.5 mm between the battery and the 4.4 mm jack for the cell's length tolerance; its other end
+# then clears the back cover's hooks by 0.3 mm
+BATT_TOP = min(FACE_44 - JACK44[2], FACE_35 - JACK35[2]) - 1.5
 BATT_Y = BATT_TOP - BATT_L / 2
 BOSS_R, INSERT_R, INSERT_D = 2.75, 1.6, 4.0
 BOSS_X, BOSS_Y = IX - BOSS_R - GAP, IY - BOSS_R - GAP
 SCREW_R, HEAD_R = 1.15, 2.1          # M2 countersunk
-SD_X, SD_Z = 16.0, Z_PARTS + SD_H / 2
+SD_X, SD_Z = 18.5, Z_PARTS + SD_H / 2
 HOOK_X = 18.0
 
 
@@ -292,11 +300,11 @@ def front_shell(coll):
         slab("window", coll, WIN_HW, WIN_HH, 1.0, Z_INNER - 0.5, T + 1, at=(0, AA_Y)),
         chamfer,
         along_y("hole_35", coll, JACK35[3] / 2 + 0.2, JACK35[3] / 2 + 0.2, 9, IY - 0.5, L / 2 + 1,
-                X_35, Z_PORT),
+                X_35, Z_35),
         along_y("hole_44", coll, JACK44[3] / 2 + 0.2, JACK44[3] / 2 + 0.2, 9, IY - 0.5, L / 2 + 1,
-                X_44, Z_PORT),
+                X_44, Z_44),
         along_y("hole_usb", coll, USBC_W / 2 + 0.2, USBC_H / 2 + 0.2, USBC_H / 2 + 0.2,
-                IY - 0.5, L / 2 + 1, X_USB, Z_PORT),
+                IY - 0.5, L / 2 + 1, X_USB, Z_USB),
         box("sd_slot", coll, SD_X - 6, SD_X + 6, -L / 2 - 1, -IY + 0.5, SD_Z - 0.75, SD_Z + 0.75),
         sphere("sd_scoop", coll, 5.0, (SD_X, -L / 2 - 4.0, SD_Z)),
     ]
@@ -396,7 +404,7 @@ def reference_parts(coll, mats, screen_image):
     screen["layer"] = "panel"
     parts.append(screen)
 
-    add(slab("battery_606090", coll, BATT_W / 2, BATT_L / 2, 1.5, Z_BATT, Z_BATT + BATT_T,
+    add(slab("battery_806090", coll, BATT_W / 2, BATT_L / 2, 1.5, Z_BATT, Z_BATT + BATT_T,
              at=(0, BATT_Y), rb=0.8, rt=0.8), "battery", "battery")
 
     if REAL_PCB:   # KiCad's model of the board: metres, centred on the board, underside at z = 0
@@ -420,10 +428,7 @@ def reference_parts(coll, mats, screen_image):
         return parts
 
     pcb = slab("pcb", coll, IX - GAP, IY - GAP, R_INNER - GAP, Z_PCB, Z_PARTS)
-    notches = []
-    for x, (w, h, d, nose) in ((X_35, JACK35), (X_44, JACK44), (X_USB, (USBC_W, USBC_H, USBC_D, 0))):
-        notches.append(box("notch", coll, x - w / 2 - 0.2, x + w / 2 + 0.2, IY - d - 0.2, IY + 1,
-                           Z_PCB - 1, Z_PARTS + 1))
+    notches = [box("notch", coll, X_44 - 3.5, X_44 + 3.5, FACE_44 - 0.25, IY + 1, Z_PCB - 1, Z_PARTS + 1)]
     for s in (-1, 1):
         x0, x1 = sorted((s * (BOSS_X - BOSS_R - 0.3), s * IX))
         notches.append(box("notch", coll, x0, x1, BOSS_Y - BOSS_R - 0.3, IY, Z_PCB - 1, Z_PARTS + 1))
@@ -455,18 +460,16 @@ def reference_parts(coll, mats, screen_image):
             x0, x1 = sorted((side * x0, side * x1))
             add(box("switch_" + name + part, coll, x0, x1, y - dy, y + dy, z0, z1), "chip", "board")
 
-    for name, x, (w, h, d, nose), plug in (("jack_3.5", X_35, JACK35, 3.5),
-                                           ("jack_4.4", X_44, JACK44, 4.4)):
-        add(box(name, coll, x - w / 2, x + w / 2, IY - d, IY, Z_PORT - h / 2, Z_PORT + h / 2),
-            "jack", "board")
-        ring = along_y(name + "_nose", coll, nose / 2, nose / 2, 9, IY, L / 2 - 0.3, x, Z_PORT)
+    for name, x, face, z, (w, h, d, nose, nose_l, drop), plug in (
+            ("jack_3.5", X_35, FACE_35, Z_35, JACK35, 3.5), ("jack_4.4", X_44, FACE_44, Z_44, JACK44, 4.4)):
+        add(box(name, coll, x - w / 2, x + w / 2, face - d, face, Z_PCB - h, Z_PCB), "jack", "board")
+        ring = along_y(name + "_nose", coll, nose / 2, nose / 2, 9, face, face + nose_l, x, z)
         r = plug / 2 + 0.1
-        boolean(ring, [along_y("plug", coll, r, r, 9, IY - 1, L, x, Z_PORT)], "DIFFERENCE")
+        boolean(ring, [along_y("plug", coll, r, r, 9, face - 1, L, x, z)], "DIFFERENCE")
         add(ring, "gold", "board")
-    usb = along_y("usb_c", coll, USBC_W / 2, USBC_H / 2, USBC_H / 2,
-                  L / 2 - 0.5 - USBC_D, L / 2 - 0.5, X_USB, Z_PORT)
+    usb = along_y("usb_c", coll, USBC_W / 2, USBC_H / 2, USBC_H / 2, IY - USBC_D, IY, X_USB, Z_USB)
     boolean(usb, [along_y("plug", coll, USBC_W / 2 - 0.35, USBC_H / 2 - 0.4, USBC_H / 2 - 0.4,
-                          L / 2 - 6.5, L, X_USB, Z_PORT)], "DIFFERENCE")
+                          IY - 6.0, L, X_USB, Z_USB)], "DIFFERENCE")
     add(usb, "metal", "board")
     for ob in parts:
         if ob.name != "screen":
@@ -523,6 +526,25 @@ def height_check(board):
         if under and hi[2] > Z_PANEL + 0.01:
             out.append(((lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, hi[2] - Z_PANEL))
     return sorted(out, key=lambda t: -t[2])
+
+
+def under_check(board):
+    """Parts hanging under the real board (the headphone jacks) that reach the battery or the
+    back: (x, y, what)."""
+    bpy.context.view_layer.update()
+    out = []
+    for ob in board.children_recursive:
+        if ob.type != "MESH":
+            continue
+        lo, hi = world_bbox(ob)
+        if lo[2] > Z_PCB - 0.3:
+            continue
+        mid = ((lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2)
+        if lo[1] < BATT_TOP + BATT_SWELL and lo[2] < Z_PCB - 0.3 and abs(mid[0]) < BATT_W / 2:
+            out.append((*mid, f"reaches the battery (y {lo[1]:.2f} < {BATT_TOP + BATT_SWELL:.2f})"))
+        if lo[2] < BACK + 0.2:
+            out.append((*mid, f"touches the back cover (z {lo[2]:.2f})"))
+    return out
 
 
 def mesh_report(ob):
@@ -643,7 +665,8 @@ def main():
 
     print(f"case: outside {W:.1f} x {L:.1f} x {T:.2f} mm (W x L x T)")
     print(f"case: layers z: battery {Z_BATT:.2f}, pcb {Z_PCB:.2f}, parts {Z_PARTS:.2f}, "
-          f"panel {Z_PANEL:.2f}, front {Z_INNER:.2f}..{T:.2f}; ports at z {Z_PORT:.2f}, "
+          f"panel {Z_PANEL:.2f}, front {Z_INNER:.2f}..{T:.2f}; ports at z: 3.5 mm {Z_35:.2f}, "
+          f"4.4 mm {Z_44:.2f}, USB-C {Z_USB:.2f}; "
           f"side keys at z {KEY_Z:.2f}")
     print(f"case: battery y {BATT_Y - BATT_L / 2:.2f}..{BATT_TOP:.2f}, panel y {PANEL_BOTTOM:.2f}.."
           f"{PANEL_TOP:.2f}, window {2 * WIN_HW:.2f} x {2 * WIN_HH:.2f} at y {AA_Y:.2f}")
@@ -662,6 +685,10 @@ def main():
         print(f"case: real board from {os.path.relpath(PCB_GLB, ROOT)}: {len(tall)} parts reach into the panel's layer")
         for x, y, over in tall[:10]:
             print(f"case:   at x {x:.1f}, y {y:.1f}: {over:.2f} mm too tall")
+        hanging = under_check(board)
+        print(f"case: parts under the board: {len(hanging)} reach the battery or the back")
+        for x, y, what in hanging[:10]:
+            print(f"case:   at x {x:.1f}, y {y:.1f}: {what}")
 
     os.makedirs(os.path.join(OUT, "stl"), exist_ok=True)
     export_stl(shell, os.path.join(OUT, "stl", "front_shell.stl"), Matrix.Rotation(math.pi, 4, "Y"))
