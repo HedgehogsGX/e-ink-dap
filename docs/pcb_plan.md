@@ -207,9 +207,13 @@ roughly $40–75 per order on top of the parts, board and assembly.
 3. ✅ **Battery:** three solder pads on the back; the battery is now an **806090, 5000 mAh,
    3 wires with a 10 kΩ NTC** (owner's choice, 2026-10-31).
 4. ✅ **Optional 5 V output:** kept on the board (2026-10-26).
-5. **Wi-Fi/Bluetooth range will be poor:** the battery's foil sits right under the module's
-   antenna. Fine if wireless is only for occasional use; otherwise use the WROOM-1U module
-   with a small stick-on antenna. Still the owner's call before ordering.
+5. ✅ **Wi-Fi/Bluetooth antenna (2026-10-31): keep the WROOM-1 and its PCB antenna for the
+   first order** (owner's choice). Its range will be poor, since the battery's foil sits
+   right under the antenna, but wireless is only for firmware updates and the clock: music
+   and books come over USB, and the ESP32-S3 has no Bluetooth audio for headphones. The
+   WROOM-1U with a stick-on antenna doesn't fix it in this case either: the only metal-free
+   spot, above the screen, is next to the jacks and DACs. Measure the range on the first
+   boards; if it is too short, the WROOM-1U goes into the next revision.
 6. ✅ Settled in stage 2: the e-paper booster values, the headphone-detect wiring and the
    GL823K power. Checked 2026-10-31 against the datasheets: see below.
 
