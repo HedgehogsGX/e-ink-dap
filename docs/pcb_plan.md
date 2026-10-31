@@ -341,8 +341,8 @@ of the same script, so everything is redone whenever the schematic or the placem
   pads (4 under the charger), and the CS43131's ground pins tied into their own centre pad.
 - **USB, routed first** (the socket's pins leave no room to spare): D+/D− from the socket
   through the ESD chip to the USB switch as a pair, 0.2 mm tracks 0.2 mm apart, on the top
-  and bottom layers only (about 90 Ω over the ground plane 0.1 mm away; check with JLCPCB's
-  impedance calculator for the 6-layer stackup), then on to the
+  and bottom layers only (about 90 Ω over the ground plane 0.0994 mm away in JLCPCB's
+  free stackup JLC06121H-3313), then on to the
   card reader and the ESP32. The socket's two D− pins straddle a D+ pin, so they are
   joined on the bottom layer. CC1/CC2 to the TUSB320L. Pair lengths: 70/75 mm to the switch
   (4.5 mm apart, about 30 ps: more than USB 2.0 layout guides like, small next to a 2 ns
@@ -404,9 +404,14 @@ the BOM (`dap-bom.csv`, JLCPCB's columns) and the placement file (`dap-cpl.csv`)
 anything blocks it, the zip is named `dap-gerbers-DRAFT.zip`.
 
 - **Order settings:** 6 layers, 1.2 mm, 60.8 × 111.8 mm; **ENIG** finish (flat pads for the
-  0.4 mm-pitch QFNs; HASL is too uneven for them); impedance control with JLCPCB's 6-layer
-  1.2 mm stackup for the USB pairs; tracks/gaps 0.1 mm; vias 0.5/0.3 mm, tented; parts on
-  the top side only.
+  0.4 mm-pitch QFNs; HASL is too uneven for them); JLCPCB's free 6-layer stackup
+  JLC06121H-3313 (1.14 mm finished; the USB pairs are drawn for its 0.0994 mm outer prepreg);
+  tracks/gaps 0.1 mm; vias 0.5/0.3 mm, filled and capped (free on 6 layers); parts on the
+  top side only.
+- **No hole under 0.3 mm (2026-10-31):** KiCad's footprints have 0.2 mm thermal vias in the
+  chips' centre pads (both CS43131s, the TPS63001, the ESP32 module). 嘉立创 charged ¥229
+  more for them (small holes, plus a four-wire test and TG155 material it then requires), so
+  `make_pcb.py` widens them to 0.3 mm (`MIN_HOLE`), pads unchanged; DRC still clean.
 - **Not assembled by JLCPCB:** the 4.4 mm jack (hand-soldered), the battery wires, the
   test pads and the net tie.
 - **Ready to order (2026-10-31):** nothing blocks it (`readiness.txt`: READY TO ORDER,

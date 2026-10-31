@@ -8,23 +8,27 @@ Check before ordering, or when the boards arrive (docs/pcb_plan.md):
 Order settings (jlcpcb.com):
   - 6 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers); layer order top, ground, signal, signal, ground, bottom (the Gerbers' file names: F_Cu, In1_Cu ... In4_Cu, B_Cu)
   - surface finish: ENIG (flat pads for the 0.4 mm-pitch QFNs)
-  - impedance control on, JLCPCB's 6-layer 1.2 mm stackup: USB pairs 0.2 mm / 0.2 mm gap on the top and bottom layers, about 90 ohm differential over the ground planes 0.1 mm away (layers 2 and 5) - check with JLCPCB's impedance calculator
-  - min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; the ESP32 footprint's thermal vias are 0.2 mm
+  - stackup JLC06121H-3313 (free; 1.14 mm finished): the USB pairs, 0.2 mm tracks 0.2 mm apart on the top and bottom layers, are about 90 ohm differential over the ground planes 0.0994 mm away (layers 2 and 5); no impedance tolerance needed
+  - min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; no hole under 0.3 mm (smaller ones cost extra)
   - plated slots 0.55 mm wide for the 4.4 mm jack, and one cut-out through the board under it
-  - vias tented (covered with solder mask)
+  - vias filled and capped (free on 6 layers; the chips' centre pads have thermal vias)
   - quantity 5 boards, 2 assembled (Economic assembly, top side only)
 
 Ordering on 嘉立创 (jlc-smt.com) instead, its forms in Chinese:
   PCB下单 - board order (member.jlc.com, after logging in):
     - 上传文件 upload: dap-gerbers.zip
     - 板子层数 layers: 6
-    - 板子厚度 thickness: 1.2
     - 板子数量 quantity: 5
-    - 外层铜厚 / 内层铜厚 copper outer / inner: 1oz / 0.5oz
-    - 焊盘喷镀 surface finish: 沉金 (ENIG)
-    - 阻焊覆盖 via covering: 过孔盖油 (tented)
-    - 阻抗 impedance: 需要 (yes): their 6-layer 1.2 mm stackup; USB pairs 0.2 mm tracks, 0.2 mm gap, outer layers, about 90 ohm - check it in their calculator
     - 确认生产稿 confirm production files: 需要 (yes): you see their files before they start
+    - 出货方式 shipped as: 单片 (single boards)
+    - 成品板厚 thickness: 1.2
+    - 外层铜厚 / 内层铜厚 copper outer / inner: 1oz / 0.5oz
+    - 层压顺序 layer order: 指定层压顺序: L1 dap-F_Cu.gtl, L2 dap-In1_Cu.g1, L3 dap-In2_Cu.g2, L4 dap-In3_Cu.g3, L5 dap-In4_Cu.g4, L6 dap-B_Cu.gbl
+    - 需要阻抗 stackup: JLC06121H-3313 (免费), and 接受差异 for its 1.14 mm: the USB pairs are drawn for its 0.0994 mm outer prepreg
+    - 阻抗管控 impedance tolerance: 无要求 (none)
+    - 嘉立创盘中孔 / 阻焊覆盖 vias: 需要 / 过孔塞树脂+过孔电镀盖帽 (filled and capped, the default)
+    - 焊盘喷镀 surface finish: 沉金 (ENIG), 1u"
+    - 最小孔径/外径 smallest hole: 0.3mm (免费)
     - SMT贴片 assembly: 需要 (yes)
     - 收货地址 delivery address: your 集运 warehouse in China
   SMT下单 - assembly order (jlc-smt.com/order):

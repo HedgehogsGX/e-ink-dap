@@ -2,6 +2,6 @@
 # JLCPCB 6-layer board limits. Written by tools/make_pcb.py.
 (rule "clearance" (constraint clearance (min 0.1mm)))
 (rule "track width" (constraint track_width (min 0.1mm)))
-(rule "hole size" (constraint hole_size (min 0.2mm)))
+(rule "hole size" (constraint hole_size (min 0.3mm)))
 (rule "hole clearance" (constraint hole_clearance (min 0.2mm)))
 (rule "edge clearance" (constraint edge_clearance (min 0.3mm)))

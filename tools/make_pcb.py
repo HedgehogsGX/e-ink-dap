@@ -241,13 +241,16 @@ MODEL_BOXES = {
 BODY_ONLY = {"ESP32-S3-WROOM-1"}   # courtyard also covers the antenna keep-out (a rule area)
 COVERS_NOTCH = {"J7"}              # the 4.4 mm jack's face overhangs its notch
 THROUGH = {"J6", "J7"}             # back-side parts whose pins or pegs go through: top side kept clear too
+# Smallest hole, mm: JLCPCB's 6-layer price covers 0.3 mm and up. KiCad's footprints have 0.2 mm
+# thermal vias in their centre pads, which added ¥229 to the 5-board order (2026-10-31)
+MIN_HOLE = 0.3
 
 # JLCPCB's 6-layer limits (or near them); KiCad reads them from hardware/dap.kicad_dru
 DRC_RULES = """(version 1)
 # JLCPCB 6-layer board limits. Written by tools/make_pcb.py.
 (rule "clearance" (constraint clearance (min 0.1mm)))
 (rule "track width" (constraint track_width (min 0.1mm)))
-(rule "hole size" (constraint hole_size (min 0.2mm)))
+(rule "hole size" (constraint hole_size (min 0.3mm)))
 (rule "hole clearance" (constraint hole_clearance (min 0.2mm)))
 (rule "edge clearance" (constraint edge_clearance (min 0.3mm)))
 """
@@ -543,6 +546,8 @@ def build():
             net = pins.get((ref, pad.GetNumber()))
             if net:
                 pad.SetNet(nets[net])
+            if 0 < pad.GetDrillSize().x < mm(MIN_HOLE):   # thermal vias: same pad, bigger hole
+                pad.SetDrillSize(pcbnew.VECTOR2I(mm(MIN_HOLE), mm(MIN_HOLE)))
         if name in MODEL_SUBST or name in MODEL_BOXES:
             fp.Models().clear()
             model = pcbnew.FP_3DMODEL()
