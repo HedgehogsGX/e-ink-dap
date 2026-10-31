@@ -7,16 +7,16 @@ are from JLCPCB's parts library on 2026-10-25.
 **Stage 2, the schematic, is drawn (2026-10-26):** see [Schematic](#schematic-stage-2) at the
 end. It follows this plan with the changes listed there.
 
-**Stage 3 under way (2026-10-27): every part is placed and every net routed except 28
-connections, mostly around the two DACs; DRC clean.** See
-[Placement draft](#placement-draft-stage-3) and [Routing](#routing-stage-3) at the end.
-Stage 4 files exist as a **draft, not ready to order**: see
+**Stage 3 (2026-10-31): every part has its real footprint and LCSC number, the board is
+60.8 × 111.8 mm (case 65 × 116 × 17.2 mm), DRC clean, but 32 connections are still
+unrouted** — the routers can't finish the audio area on 4 layers; see "Routing on 4 layers"
+at the end. Stage 4 files exist as a **draft, not ready to order**: see
 [JLCPCB files](#jlcpcb-files-stage-4-draft).
 
 One board, 4 layers, assembled by JLCPCB on **one side** (the side facing the screen), so it
 stays in their cheaper "Economic" assembly. Its outline comes from the case model
-(`tools/make_case.py`): about 60.8 × 105.8 mm, with notches for the jacks, USB-C and the two
-screw bosses.
+(`tools/make_case.py`): 60.8 × 111.8 mm (since 2026-10-31), with a shallow notch for the
+4.4 mm jack and cut-outs for the two screw bosses.
 
 ## What changed from PROJECT.md §3
 
@@ -152,7 +152,7 @@ the prototype) is reused for the Power key.
 | Function | Part | JLCPCB no. | Stock | Each | Notes |
 |---|---|---|---|---|---|
 | MCU + flash + PSRAM + Wi-Fi/BT | ESP32-S3-WROOM-1-N16R8 | C2913202 | 27,240 | $5.35 | |
-| DAC + headphone amp ×2 | CS43131-CNZR (QFN-40) | C965907 | 13 | $5.60 | ~8,500 more at LCSC's partner stock, 3–5 days. Order early. |
+| DAC + headphone amp ×2 | CS43131-CNZR (QFN-40) | C965907 | 13 | $5.60 | ~8,500 more at LCSC's partner stock, 3–5 days. Order early. **0 at JLCPCB on 2026-10-31:** pre-order 4 into your JLCPCB parts inventory before ordering the boards. |
 | 22.5792 MHz oscillator | SX3M22.5792M20F30TNN | C2901572 | 861 | $0.33 | 1.62–3.63 V, 3.2 × 2.5 mm |
 | 24.576 MHz oscillator | SX3M24.576M20F30TNN | C2901574 | 1,749 | $0.48 | same series |
 | I2S level shifter | SN74AVC4T774PWR | C129363 | 11,891 | $0.77 | |
@@ -170,16 +170,16 @@ the prototype) is reused for the Power key.
 | USB card reader | GL823K-HCY04 | C284879 | 115,985 | $0.49 | makes its own clock, no crystal |
 | 5 V boost (optional) | TPS61023DRLR | C919459 | 9,169 | $0.24 | |
 | 5 V current-limit switch (optional) | TPS2553DBVR | C55266 | 49,565 | $0.54 | |
-| microSD socket, push-push | TF-01A (Hroparts) | C91145 | 172,459 | $0.19 | |
-| E-paper connector, 24-pin 0.5 mm | AFC07-S24FCA-00 | C262567 | 47,608 | $0.13 | bottom contact; KiCad has its footprint. Contact side to confirm against how the ribbon folds |
-| Touch connector, 6-pin 0.5 mm | AFC07-S06FCA-00 | C262553 | 31,892 | $0.11 | same |
+| microSD socket, push-push | TF-01A (Hroparts) | C91145 | 161,103 | $0.19 | footprint from its drawing (2026-10-31); card-detect contact not used |
+| E-paper connector, 24-pin 0.5 mm | AFC07-S24FCA-00 | C262567 | 47,490 | $0.13 | bottom contact; KiCad has its footprint. Checked 2026-10-31: contact side and pin order match the ribbon folded under the panel (see below) |
+| Touch connector, 6-pin 0.5 mm | AFC07-S06FCA-00 | C262553 | 31,286 | $0.11 | bottom contact, KiCad's footprint |
 | Side keys ×4 | Alps SKRTLAE010, side-push 4.5 × 3.4 × 3.3 mm | C110293 | 43,836 | $0.14 | |
-| 3.5 mm jack | PJ-342 (SHOU HAN) | C668606 | 73,200 | $0.18 | 4-pole (TRRS), 4.5 mm tall; detect contact to check in its drawing |
-| Battery connector | ~~JST PH 3-pin, right angle (S3B-PH-SM4-TB)~~ → 3 solder pads on the back | — | — | — | Changed in the placement draft: the JST PH is too tall for the 3.3 mm gap under the screen and has no room beside the jacks |
-| **4.4 mm jack** | **not in JLCPCB's library** | — | — | — | Buy on Taobao (4.4mm 平衡母座) and hand-solder; I need its drawing for the footprint. |
-| **USB-C, 16-pin** | TYPE-C-31-M-12 (top mount) | C165948 | 324,076 | $0.19 | The case assumes a **mid-mount** one, which I couldn't find in stock. A top-mount one works if the hole in the case moves up ~3 mm. |
+| 3.5 mm jack | PJ-342 (SHOU HAN) | C668606 | 71,732 | $0.18 | 3-pole stereo with a switch on tip and ring (closed while empty); 4.5 mm tall, so it sits **on the back** of the board and is **hand-soldered** |
+| Battery connector | ~~JST PH 3-pin, right angle (S3B-PH-SM4-TB)~~ → 3 solder pads on the back | — | — | — | Changed in the placement draft: the JST PH is too tall for the 3.3 mm gap under the screen and has no room beside the jacks. Battery since 2026-10-31: **806090, 5000 mAh, 3 wires with 10 kΩ NTC** |
+| **4.4 mm jack** | **Kinghelm KH-PJ-44002-12DBAP-A** (slim, 12 pins, plug switch) | C42396781 | 0 | — | Chosen 2026-10-31 for its full drawing. Not stocked by JLCPCB: **buy it** (Taobao 金航标 or LCSC) and hand-solder it **on the back** of the board. 21 mm long with its nose. |
+| USB-C, 16-pin | TYPE-C-31-M-12 (top mount) | C165948 | 283,819 | $0.19 | Top-mount kept; since 2026-10-31 the case puts every port's hole at its own part's height |
 | E-paper booster | Good Display reference circuit | — | — | — | inductor, N-MOSFET, 3 Schottky diodes, 0.47 Ω, ~10 × 1 µF/25 V; values from the panel's spec in stage 2 |
-| Resistors, capacitors, ferrites | ~100, mostly JLCPCB Basic parts | — | — | — | |
+| Resistors, capacitors, inductors, ferrite, LED | ~105, each with its LCSC number in `tools/make_schematic.py` (PASSIVES), checked on lcsc.com 2026-10-31 | — | — | — | mostly JLCPCB Basic parts. LCSC had only 40 of the 10 µH inductor (C354566) |
 
 About 25 different Extended parts: at JLCPCB's current $1.50–3 loading fee each, that's
 roughly $40–75 per order on top of the parts, board and assembly.
@@ -200,20 +200,18 @@ roughly $40–75 per order on top of the parts, board and assembly.
 
 ## Open items
 
-1. **4.4 mm jack:** pick one (Taobao), send me the listing or its drawing.
-2. **USB-C:** a top-mount port is fine if the case hole moves; or find a mid-mount one.
-3. **Battery plug:** what connector does the 606090 have (a photo is enough)? 3 wires means
-   + , − and the NTC. The placement draft solders the wires to pads instead (see
-   below); a connector needs one under 3.3 mm tall (JST SH, 2.9 mm) and a wire slot.
-4. **Optional 5 V output** (power a USB DAC from the player): keep it on the board, or
-   leave it out?
+1. ✅ **4.4 mm jack (2026-10-31):** Kinghelm KH-PJ-44002-12DBAP-A, from its drawing. A 4.4 mm
+   plug is 19.5 mm long (JEITA RC-8141C), so the jack is about 21 mm deep with its nose, not
+   the 14 mm the first case assumed: see "Finishing stages 3 and 4" below.
+2. ✅ **USB-C (2026-10-31):** the top-mount TYPE-C-31-M-12 stays; the case's hole is at its height.
+3. ✅ **Battery:** three solder pads on the back; the battery is now an **806090, 5000 mAh,
+   3 wires with a 10 kΩ NTC** (owner's choice, 2026-10-31).
+4. ✅ **Optional 5 V output:** kept on the board (2026-10-26).
 5. **Wi-Fi/Bluetooth range will be poor:** the battery's foil sits right under the module's
    antenna. Fine if wireless is only for occasional use; otherwise use the WROOM-1U module
-   with a small stick-on antenna.
-6. Settled in stage 2: the e-paper booster values (Good Display's reference circuit), the
-   headphone-detect wiring (below) and the GL823K power (straight from VBUS, no switch).
-   Still unconfirmed: the CS43131 RESET input threshold (the datasheet gives none; it is
-   driven at 3.3 V, inside its VP-domain limit).
+   with a small stick-on antenna. Still the owner's call before ordering.
+6. ✅ Settled in stage 2: the e-paper booster values, the headphone-detect wiring and the
+   GL823K power. Checked 2026-10-31 against the datasheets: see below.
 
 ## Schematic (stage 2)
 
@@ -394,3 +392,83 @@ anything blocks it, the zip is named `dap-gerbers-DRAFT.zip`.
   pins, 15 µF capacitors, jack detect contacts).
 - In JLCPCB's placement preview, check each part's rotation: some library parts are drawn
   turned 90° or 180° from KiCad's footprints.
+
+## Finishing stages 3 and 4 (2026-10-31)
+
+**Board and case size.** The owner moved to a 5000 mAh cell (806090: 8 × 60 × 90 mm, three
+wires with a 10 kΩ NTC). Real 4.4 mm jacks are about 21 mm deep with their nose (the
+Pentaconn plug is 19.5 mm long), so the 14 mm jack area of the first case could never hold
+one. Both headphone jacks now hang from the **back** of the board into the top end, where
+the battery isn't: the case is **65 × 116 × 17.2 mm** (owner's choice over a 110 mm case with
+a shorter, thicker cell) and the board **60.8 × 111.8 mm**. The battery lies between the
+4.4 mm jack (1.5 mm away) and the back cover's hooks (0.3 mm), and its wires reach the pads
+on the back just past its end.
+
+**Parts with real footprints now** (the generated ones in `hardware/dap.pretty`, from each
+maker's drawing; pad positions cross-checked with JLCPCB's EasyEDA library):
+- **3.5 mm jack, SHOU HAN PJ-342 (C668606), on the back, hand-soldered.** Its drawing shows a
+  3-pole stereo jack, not 4-pole: tip 3, ring 6, pins 5 and 2 on the sleeve end, and a
+  switch on tip and ring that is closed while no plug is in (4 and 7). Tip → OUT_LP, ring →
+  OUT_RP, 5/2 → HP_GND, 4 → DET_35, 7 unused. Its front face sits on the board edge, the
+  2 mm nose ends 0.1 mm inside the case's face; two 1.5 mm pegs go through the board.
+- **4.4 mm jack, Kinghelm KH-PJ-44002-12DBAP-A (C42396781), on the back, hand-soldered.**
+  Slim (6.5 × 5 mm, axis 2.5 mm off its seat), 12 slotted pins, two per pole in Pentaconn
+  order (1/6 ground, 2/7 R−, 3/8 R+, 4/9 L−, 5/10 L+) and a separate plug switch 11–12. Its
+  front face overhangs a 1.15 mm notch in the board edge by 0.25 mm, as its drawing asks,
+  so the 2.8 mm nose ends 0.2 mm inside the case's face. The drawing's clearance hole for
+  the plug switch is cut through the board, with a keep-out around it for the routers.
+- **microSD, Hroparts TF-01A (C91145):** pads 1–8, four shell tabs (SH, ground), the
+  card-detect contact (CD) not used. The card mouth sits at the board's bottom edge, x 18.5
+  mm (moved 2.5 mm right to clear the e-paper connector).
+- **Touch connector:** KiCad's Jushuo AFC07-S06FCA-00 footprint.
+
+**Datasheet checks** (the four left open in stage 2, and two more found on the way):
+- **Oscillators** (SCTF SX3M): pin 1 is tri-state, "output enabled when logic 1 or open,
+  disabled when logic 0": OE high = running, and the off one's output is high-impedance,
+  so the two can share MCLK. Pinout 1 OE, 2 GND, 3 out, 4 Vdd matches the symbol.
+- **GL823K:** VDDA (USB PHY) and VDD (digital) are both its 3.3 V supplies, made by its
+  own 5 V → 3.3 V regulator from the 5V pin: tied together with 1 µF + 100 nF, as drawn.
+- **CS43131 FILT± capacitors:** Cirrus gives 15 µF as nominal, low-ESR X5R/X7R. Now **22 µF
+  0805, 25 V** (the same part as the other 22 µF): about 15–19 µF left at 1.8 V of bias,
+  where a 15 µF part would keep about 11 µF.
+- **Headphone detect:** Cirrus wants a sense contact that floats with no plug and touches
+  the tip with one; HP_DETECT has a weak internal pull-up, reads low when tied to the
+  amplifier output, and its polarity can be inverted (HPDETECT_INV). The PJ-342's tip
+  switch does the opposite (touches the tip while empty), so the 3.5 mm side needs
+  HPDETECT_INV = 1. The Kinghelm's plug switch is separate: one side to ground, the other
+  to DET_44; its polarity is set the same way once tried. While only the 4.4 mm jack is in
+  use, the 3.5 mm detect input sees the left output's audio; it only reaches the 2.0 V
+  input threshold near full scale, and the debounce filters that.
+- **E-paper ribbon** (GDEY037T03-T02 spec: drawing p. 6, reference circuit p. 35): the
+  ribbon's gold faces the display side, so folded under the panel it faces the board:
+  bottom-contact connector, as placed. Seen from the front with the ribbon at the bottom,
+  its pin 1 is on the left, and so is the connector's pin 1: the order matches. Its centre
+  is 0.4 mm left of the panel's centre (measured on the drawing, ±0.3 mm), so the connector
+  moved from x −2.0 to **−0.4 mm**: the 1 cm ribbon can't take up 1.6 mm sideways.
+- **E-paper reference circuit:** pin 19 (VPP) is left open and the MOSFET gate pull-down is
+  1 MΩ in this panel's reference circuit; the board had a 1 µF on VPP and 10 kΩ. Both now as
+  the reference; R1 and R2 (1 MΩ, 0.47 Ω) are 0603 as its parts table asks.
+
+**LCSC numbers for every part** (`PASSIVES` in `tools/make_schematic.py`, checked on
+lcsc.com): UNI-ROYAL 1 % resistors, Samsung X5R/X7R capacitors, Cenker inductors in the
+footprints already used, Murata BLM18KG601SN1D ferrite (1.3 A) on VP, Everlight green LED.
+49.9 kΩ (TPS2553 current limit) had no stock: 47 kΩ, ~0.5 A. Stock at JLCPCB itself on
+2026-10-31: every assembled part had some except the **CS43131 (0)**: pre-order 4 into the
+JLCPCB parts inventory before ordering. LCSC had only 40 of the 10 µH inductor.
+
+**Ordering:** JLCPCB makes at least 5 boards per order and assembles 2 or more of them
+(Economic assembly: 2–50 boards, one side, 2/4/6 layers, 0.8–1.6 mm). Order 5, assemble 2.
+
+**Routing on 4 layers (2026-10-31): not finished.** Seven full runs (about an hour each) with
+the real parts left between 21 and 37 connections unrouted, always in the same places: the
+two DACs' bus, clock and charge-pump nets, the I2C and I2S lines that cross the audio area,
+the headphone lines to the 4.4 mm jack, and a few enable lines at the charger. What was
+tried: our router for local nets, buses and rails with Freerouting for the rest (21–27);
+Freerouting allowed on layer 3 as well, ground poured around its tracks there but kept whole
+under the USB pairs (23); our router for the critical nets only and Freerouting for all
+else, with track widths from net classes (37); a 1.4 mm ring kept free around each DAC for
+its pins (27); the clocks, level shifters and 1.8 V regulators moved to a column between
+the DACs, so shared buses and rails fan out both ways (now in place); and Freerouting
+allowed to rip up everything but the critical nets (32). Freerouting stops improving after
+about 7 passes and reports 87–129 "unfixable violations" in the locked copper, so it avoids
+whole areas. The board is DRC clean apart from the unrouted connections.

@@ -18,6 +18,7 @@ import collections
 import csv
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -35,24 +36,29 @@ CLI = "/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli"
 
 LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu", "F.Paste", "B.Paste", "F.Silkscreen", "B.Silkscreen",
           "F.Mask", "B.Mask", "Edge.Cuts"]
-NOT_ASSEMBLED = {"J1": "battery wires, soldered to the pads by hand",
-                 "J7": "4.4 mm jack: not in JLCPCB's library, soldered by hand",
+NOT_ASSEMBLED = {"J1": "battery wires, soldered to the pads on the back by hand",
+                 "J6": "3.5 mm jack PJ-342 (C668606), on the back: soldered by hand (JLCPCB's Economic "
+                       "assembly is one side only, and it lists this jack as hand-soldered anyway)",
+                 "J7": "4.4 mm jack Kinghelm KH-PJ-44002-12DBAP-A (C42396781), on the back: bought separately, "
+                       "soldered by hand",
                  "TP1": "test pad", "TP2": "test pad", "NT1": "net tie: copper only"}
-# Footprints that only stand in for the part that will be fitted
-STANDIN = {"J3": "touch FPC: Hirose FH12 outline, the part is a Jushuo AFC07-S06FCA-00 (C262553)",
-           "J5": "microSD: Hirose DM3D outline, the part is a TF-01A (C91145)"}
-# Points from docs/pcb_plan.md still to check against the parts' datasheets
-TO_CONFIRM = ["oscillators: OE high = running, output high-impedance when off (they share MCLK)",
-              "GL823K: VDD and VDDA tied together as its internal 3.3 V (Genesys reference design)",
-              "15 uF 0805 capacitors at the CS43131 FILT pins: pick a part, or use 22 uF",
-              "jacks: the detect contact touches the tip when a plug is in"]
-ORDER = ["4 layers, 1.2 mm thick, 60.8 x 105.8 mm (outline in the Gerbers)",
+# Footprints that only stand in for the part that will be fitted (none left)
+STANDIN = {}
+# Points to check before ordering or when the boards arrive (docs/pcb_plan.md)
+TO_CONFIRM = ["stock: JLCPCB had no CS43131-CNZR (C965907) on 2026-10-31 - pre-order 4 into your JLCPCB parts "
+              "inventory before the order; LCSC had only 40 of the 10 uH inductor (C354566)",
+              "touch ribbon: with the display facing up, its gold contacts must face up as well (like the "
+              "e-paper ribbon's), so they face the bottom-contact connector once folded under the panel",
+              "plug detect: the 3.5 mm jack's switch opens when a plug goes in, the 4.4 mm jack's is "
+              "unknown - the firmware sets HPDETECT_INV for each after a try"]
+ORDER = ["4 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers)",
          "surface finish: ENIG (flat pads for the 0.4 mm-pitch QFNs)",
          "impedance control on, a JLCPCB 4-layer 1.2 mm stackup: USB pair 0.2 mm / 0.2 mm gap,"
          " about 90 ohm differential over layer 2 - check with JLCPCB's impedance calculator",
          "min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; the ESP32 footprint's thermal vias are 0.2 mm",
+         "plated slots 0.55 mm wide for the 4.4 mm jack, and one cut-out through the board under it",
          "vias tented (covered with solder mask)",
-         "assembly: top side only (the battery pads on the back carry no part)"]
+         "quantity 5 boards, 2 assembled (Economic assembly, top side only)"]
 
 
 def run(*args):
@@ -126,8 +132,9 @@ def main():
         run("pcb", "export", "drill", "-o", tmp + os.sep, "--format", "excellon", "--excellon-units", "mm",
             "--excellon-zeros-format", "decimal", "--excellon-separate-th", BOARD)
         for old in os.listdir(OUT):
-            if old.startswith("dap-gerbers"):
-                os.remove(os.path.join(OUT, old))
+            if old.startswith("dap-gerbers"):   # earlier zips, and folders they were unpacked into
+                path = os.path.join(OUT, old)
+                shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
         zip_path = os.path.join(OUT, "dap-gerbers.zip" if ready else "dap-gerbers-DRAFT.zip")
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
             for name in sorted(os.listdir(tmp)):
@@ -165,7 +172,7 @@ def main():
     lines = [("READY TO ORDER" if ready else "NOT READY TO ORDER - the files are a draft"), ""]
     if blockers:
         lines += ["Blocks ordering:"] + [f"  - {b}" for b in blockers] + [""]
-    lines += ["Still to confirm against the datasheets (docs/pcb_plan.md):"] + [f"  - {t}" for t in TO_CONFIRM]
+    lines += ["Check before ordering, or when the boards arrive (docs/pcb_plan.md):"] + [f"  - {t}" for t in TO_CONFIRM]
     lines += ["", "Order settings:"] + [f"  - {o}" for o in ORDER]
     lines += ["", "Not assembled by JLCPCB:"] + [f"  - {r}: {why}" for r, why in NOT_ASSEMBLED.items()]
     lines += ["", f"Files: {os.path.basename(zip_path)} ({len(files)} files: {', '.join(files)}),",
