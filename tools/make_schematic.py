@@ -8,7 +8,8 @@
   audio.kicad_sch: one sheet per block of docs/pcb_plan.md
 - hardware/dap.kicad_sym + sym-lib-table: symbols KiCad doesn't ship (CS43131, GL823K,
   SN74AVC4T774, TPS61023, TPS2553, the two headphone jacks); fp-lib-table points at the
-  stand-in footprints that tools/make_pcb.py writes to hardware/dap.pretty
+  footprints KiCad doesn't have (jacks, microSD socket, battery pads), which
+  tools/make_pcb.py writes to hardware/dap.pretty
 
 The design (parts, values, connections) is the DESIGN table below; the drawing is
 generated, so change the table and re-run rather than editing the sheets by hand. Pins
@@ -36,6 +37,7 @@ POWER_VCC = ["SYS", "VBAT", "VBUS", "VP", "1V8_A", "1V8_CP", "1V8_D", "5V_BOOST"
 
 # ---- Footprints
 R0402, C0402 = "Resistor_SMD:R_0402_1005Metric", "Capacitor_SMD:C_0402_1005Metric"
+R0603 = "Resistor_SMD:R_0603_1608Metric"
 C0603, C0805 = "Capacitor_SMD:C_0603_1608Metric", "Capacitor_SMD:C_0805_2012Metric"
 FB0603 = "Inductor_SMD:L_0603_1608Metric"
 L3015, L2520 = "Inductor_SMD:L_Cenker_CKCS3015", "Inductor_SMD:L_Cenker_CKCS252010"
@@ -48,22 +50,41 @@ class Part:
         self.ref = None
 
 
+# LCSC part numbers for the passives, by (value, footprint), checked on lcsc.com 2026-10-31.
+# Resistors UNI-ROYAL 1 %; capacitors Samsung X5R/X7R rated at least 3x their voltage
+# (1 uF/50V and 4.7 uF/50V for the e-paper booster, whose rails reach +-20 V).
+PASSIVES = {
+    ("0.47", R0603): "C23411", ("22", R0402): "C25092", ("1k", R0402): "C11702",
+    ("1.1k", R0402): "C25860", ("1.62k", R0402): "C61897", ("4.7k", R0402): "C25900",
+    ("4.99k", R0402): "C25903", ("10k", R0402): "C25744", ("47k", R0402): "C25792",
+    ("68k", R0402): "C36871", ("100k", R0402): "C25741", ("200k", R0402): "C25764",
+    ("768k", R0402): "C27017", ("887k", R0402): "C423127", ("1M", R0402): "C26083",
+    ("1M", R0603): "C22935",
+    ("100nF", C0402): "C1525", ("1uF", C0402): "C52923", ("1uF", C0603): "C15849",
+    ("1uF/50V", C0603): "C15849", ("2.2uF", C0603): "C23630", ("4.7uF", C0603): "C19666",
+    ("10uF", C0805): "C15850", ("22uF", C0805): "C45783", ("4.7uF/50V", C0805): "C98192",
+    ("1.5uH", L3015): "C5291780", ("10uH", L3015): "C354566", ("1uH", L2520): "C354542",
+    ("600R@100MHz", FB0603): "C85833",
+}
+
+
 def R(value, a, b, fp=R0402):
-    return Part("R", "Device:R", value, {"1": a, "2": b}, fp)
+    return Part("R", "Device:R", value, {"1": a, "2": b}, fp, PASSIVES.get((value, fp), ""))
 
 
 def C(value, a, b="GND", fp=C0402):
-    fp = fp if fp != C0402 else (C0805 if value in ("10uF", "15uF", "22uF") else
+    fp = fp if fp != C0402 else (C0805 if value in ("10uF", "22uF") else
                                  C0603 if value in ("2.2uF", "4.7uF") else C0402)
-    return Part("C", "Device:C", value, {"1": a, "2": b}, fp)
+    return Part("C", "Device:C", value, {"1": a, "2": b}, fp, PASSIVES.get((value, fp), ""))
 
 
 def L(value, a, b, fp):
-    return Part("L", "Device:L", value, {"1": a, "2": b}, fp)
+    return Part("L", "Device:L", value, {"1": a, "2": b}, fp, PASSIVES.get((value, fp), ""))
 
 
 def FB(a, b):
-    return Part("FB", "Device:FerriteBead_Small", "600R@100MHz", {"1": a, "2": b}, FB0603)
+    return Part("FB", "Device:FerriteBead_Small", "600R@100MHz", {"1": a, "2": b}, FB0603,
+                PASSIVES[("600R@100MHz", FB0603)])
 
 
 # ---- Custom symbols: name, reference, footprint, left pins, right pins.
@@ -116,13 +137,18 @@ CUSTOM = {
                 [("1", "IN", "power_in"), ("3", "EN", "input"), ("5", "ILIM", "passive"),
                  ("2", "GND", "power_in")],
                 [("6", "OUT", "power_out"), ("4", "~{FAULT}", "open_collector")]),
-    "AudioJack_3.5_TRRS": ("J", "dap:Jack_3.5mm_PJ-342_standin",
-                           "3.5 mm jack, 4 poles + tip-detect switch (PJ-342); pin numbers follow the part's drawing",
-                           [("4", "T", "passive"), ("5", "TS", "passive"), ("3", "R1", "passive"),
-                            ("2", "R2", "passive"), ("1", "S", "passive")], []),
-    "AudioJack_4.4": ("J", "dap:Jack_4.4mm_standin", "4.4 mm balanced jack (Pentaconn order T L+, R1 L-, R2 R+, R3 R-, S GND) with detect",
-                      [("1", "T", "passive"), ("2", "R1", "passive"), ("3", "R2", "passive"),
-                       ("4", "R3", "passive"), ("5", "S", "passive"), ("6", "DET", "passive")], []),
+    "PJ-342": ("J", "dap:Jack_3.5mm_PJ-342",
+               "3.5 mm stereo jack, SHOU HAN PJ-342: tip 3 and ring 6, each with a switch that is closed "
+               "while no plug is in (4, 7); 5 and 2 touch the sleeve end of the plug",
+               [("3", "T", "passive"), ("4", "TSW", "passive"), ("6", "R", "passive"),
+                ("7", "RSW", "passive"), ("5", "S", "passive"), ("2", "S", "passive")], []),
+    "KH-PJ-44002": ("J", "dap:Jack_4.4mm_KH-PJ-44002-12DBAP-A",
+                    "4.4 mm balanced jack, Kinghelm KH-PJ-44002-12DBAP-A: two pins per pole in Pentaconn "
+                    "order (tip L+, L-, R+, R-, sleeve ground) and a separate plug switch 11-12",
+                    [("5", "L+", "passive"), ("10", "L+", "passive"), ("4", "L-", "passive"),
+                     ("9", "L-", "passive"), ("3", "R+", "passive"), ("8", "R+", "passive"),
+                     ("2", "R-", "passive"), ("7", "R-", "passive"), ("1", "S", "passive"),
+                     ("6", "S", "passive"), ("11", "SW_A", "passive"), ("12", "SW_B", "passive")], []),
 }
 
 
@@ -201,7 +227,7 @@ def power_sheet():
             C("1uF", "1V8_A"), C("1uF", "1V8_CP"), C("1uF", "1V8_D"),
             FB("SYS", "VP"), C("10uF", "VP"),
         ]),
-        ("Optional 5 V out for a USB DAC: TPS61023 boost (5.1 V) + TPS2553 limit ~520 mA; leave unassembled if not needed", [
+        ("Optional 5 V out for a USB DAC: TPS61023 boost (5.1 V) + TPS2553 limit ~500 mA (47k); leave unassembled if not needed", [
             Part("dap", "dap:TPS61023", "TPS61023DRLR",
                  {"VIN": "SYS", "SW": "BST_SW", "EN": "BOOST_EN", "GND": "GND", "VOUT": "5V_BOOST",
                   "FB": "BST_FB"}, lcsc="C919459"),
@@ -210,7 +236,7 @@ def power_sheet():
             Part("dap", "dap:TPS2553", "TPS2553DBVR",
                  {"IN": "5V_BOOST", "EN": "BOOST_EN", "ILIM": "SW_ILIM", "GND": "GND", "OUT": "VBUS"},
                  lcsc="C55266", nc=["~{FAULT}"]),
-            R("49.9k", "SW_ILIM", "GND"), C("100nF", "5V_BOOST"),
+            R("47k", "SW_ILIM", "GND"), C("100nF", "5V_BOOST"),
         ]),
     ]
 
@@ -248,7 +274,8 @@ def mcu_sheet():
             R("1M", "VBAT", "VBAT_SENSE"), R("1M", "VBAT_SENSE", "GND"), C("100nF", "VBAT_SENSE"),
             R("4.7k", "+3V3", "I2C_SDA"), R("4.7k", "+3V3", "I2C_SCL"),
             R("1k", "+3V3", "CHG_LED_A"),
-            Part("D", "Device:LED", "green", {"A": "CHG_LED_A", "K": "CHG_N"}, "LED_SMD:LED_0603_1608Metric"),
+            Part("D", "Device:LED", "green", {"A": "CHG_LED_A", "K": "CHG_N"}, "LED_SMD:LED_0603_1608Metric",
+                 "C72043"),
             Part("TP", "Connector:TestPoint", "TX", {"1": "DEBUG_TX"}, "TestPoint:TestPoint_Pad_D1.0mm"),
             Part("TP", "Connector:TestPoint", "GND", {"1": "GND"}, "TestPoint:TestPoint_Pad_D1.0mm"),
         ]),
@@ -258,31 +285,33 @@ def mcu_sheet():
 def display_sheet():
     fpc = {"1": None, "2": "EPD_GDR", "3": "EPD_RESE", "4": "EPD_VGL", "5": "EPD_VGH", "6": None, "7": None,
            "8": "GND", "9": "EPD_BUSY", "10": "EPD_RST", "11": "EPD_DC", "12": "EPD_CS", "13": "EPD_SCK",
-           "14": "EPD_MOSI", "15": "+3V3", "16": "+3V3", "17": "GND", "18": "EPD_VDD", "19": "EPD_VPP",
+           "14": "EPD_MOSI", "15": "+3V3", "16": "+3V3", "17": "GND", "18": "EPD_VDD", "19": None,
            "20": "EPD_VSH", "21": "EPD_PREVGH", "22": "EPD_VSL", "23": "EPD_PREVGL", "24": "EPD_VCOM"}
     c50 = lambda net: C("1uF/50V", net, fp=C0603)  # noqa: E731
     return [
-        ("E-paper GDEY037T03 (UC8253), 24-pin FPC: Good Display's reference booster circuit, 0.47 R sense for UC driver ICs. BS1 low = 4-wire SPI", [
+        ("E-paper GDEY037T03 (UC8253), 24-pin FPC: the reference circuit in the GDEY037T03-T02 spec (p. 35), 0.47 R sense for UC driver ICs. BS1 low = 4-wire SPI", [
             Part("J", "Connector_Generic:Conn_01x24", "E-paper FPC",
                  {k: v for k, v in fpc.items() if v}, "Connector_FFC-FPC:Jushuo_AFC07-S24FCA-00_1x24-1MP_P0.50_Horizontal",
                  "C262567", nc=[k for k, v in fpc.items() if not v],
-                 note="pin 1 NC, 6/7 temperature sensor I2C unused"),
+                 note="pin 1 NC, 6/7 temperature sensor I2C unused, 19 VPP (test pin) left open as in the "
+                      "reference circuit. Bottom contact: the ribbon's gold faces the display and turns "
+                      "towards the board when folded under the panel"),
             L("10uH", "+3V3", "EPD_SW", L3015), C("4.7uF/50V", "+3V3", fp=C0805),
             Part("Q", "Transistor_FET:Q_NMOS_GSD", "Si1308EDL", {"G": "EPD_GDR", "S": "EPD_RESE", "D": "EPD_SW"},
                  "Package_TO_SOT_SMD:SOT-323_SC-70", "C469327"),
-            R("10k", "EPD_GDR", "GND"), R("0.47", "EPD_RESE", "GND"),
+            R("1M", "EPD_GDR", "GND", fp=R0603), R("0.47", "EPD_RESE", "GND", fp=R0603),
             Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_SW", "K": "EPD_PREVGH"}, "Diode_SMD:D_SOD-123", "C77336"),
             Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_NEG", "K": "GND"}, "Diode_SMD:D_SOD-123", "C77336"),
             Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_PREVGL", "K": "EPD_NEG"}, "Diode_SMD:D_SOD-123", "C77336"),
             C("4.7uF/50V", "EPD_SW", "EPD_NEG", fp=C0805),
-            c50("EPD_VGL"), c50("EPD_VGH"), c50("+3V3"), c50("EPD_VDD"), c50("EPD_VPP"), c50("EPD_VSH"),
+            c50("EPD_VGL"), c50("EPD_VGH"), c50("+3V3"), c50("EPD_VDD"), c50("EPD_VSH"),
             c50("EPD_PREVGH"), c50("EPD_VSL"), c50("EPD_PREVGL"), c50("EPD_VCOM"),
         ]),
         ("Touch FT6336U, 6-pin FPC (Good Display TP037-S02: 1 GND, 2 VDD, 3 RST, 4 INT, 5 SDA, 6 SCL), I2C address 0x38", [
             Part("J", "Connector_Generic:Conn_01x06", "Touch FPC",
                  {"1": "GND", "2": "+3V3", "3": "TP_RST", "4": "TP_INT", "5": "I2C_SDA", "6": "I2C_SCL"},
-                 "Connector_FFC-FPC:Hirose_FH12-6S-0.5SH_1x06-1MP_P0.50mm_Horizontal", "C262553",
-                 note="footprint stands in for the Jushuo AFC07-S06FCA-00 until stage 3"),
+                 "Connector_FFC-FPC:Jushuo_AFC07-S06FCA-00_1x6-1MP_P0.50_Horizontal", "C262553",
+                 note="bottom contact, like the e-paper connector; the 56 mm touch tail folds flat under the panel"),
             C("1uF", "+3V3"), R("10k", "+3V3", "TP_RST"), R("10k", "+3V3", "TP_INT"),
         ]),
     ]
@@ -334,8 +363,8 @@ def usb_storage_sheet():
             Part("J", "Connector:Micro_SD_Card", "microSD",
                  {"DAT2": "SDC_D2", "DAT3/CD": "SDC_D3", "CMD": "SDC_CMD", "VDD": "+3V3", "CLK": "SDC_CLK",
                   "VSS": "GND", "DAT0": "SDC_D0", "DAT1": "SDC_D1", "SHIELD": "GND"},
-                 "Connector_Card:microSD_HC_Hirose_DM3D-SF", "C91145",
-                 note="footprint stands in for the TF-01A until stage 3"),
+                 "dap:microSD_TF-01A", "C91145",
+                 note="Hroparts TF-01A push-push socket; its card-detect contact (pad CD) is not used"),
             R("10k", "+3V3", "SDC_CMD"), R("10k", "+3V3", "SDC_D0"), R("10k", "+3V3", "SDC_D1"),
             R("10k", "+3V3", "SDC_D2"), R("10k", "+3V3", "SDC_D3"), C("10uF", "+3V3"), C("100nF", "+3V3"),
         ]),
@@ -353,7 +382,7 @@ def dac(side, adr, out_a, out_b, detect, master):
             "FLYP_VCP": p + "FLYP_VCP", "FLYC_VCP": p + "FLYC_VCP", "FLYN_VCP": p + "FLYN_VCP",
             "HPOUTA": out_a, "HPOUTB": out_b, "HPREFA": "HP_GND", "HPREFB": "HP_GND", "HP_DETECT": detect}
     caps = [C("100nF", "1V8_D"), C("100nF", "1V8_D"), C("100nF", "VP"), C("4.7uF", "VP"),
-            C("2.2uF", "1V8_A"), C("15uF", p + "FILTP", "1V8_A"), C("15uF", p + "FILTN", p + "NVA"),
+            C("2.2uF", "1V8_A"), C("22uF", p + "FILTP", "1V8_A"), C("22uF", p + "FILTN", p + "NVA"),
             C("2.2uF", p + "NVA"), C("2.2uF", p + "FLYP_VA", p + "FLYN_VA"),
             C("2.2uF", "1V8_CP"), C("2.2uF", p + "VCPF_P"), C("2.2uF", p + "VCPF_N"),
             C("2.2uF", p + "FLYP_VCP", p + "FLYC_VCP"), C("2.2uF", p + "FLYC_VCP", p + "FLYN_VCP")]
@@ -395,13 +424,16 @@ def audio_sheet():
         ]),
         dac("L", "GND", "OUT_LP", "OUT_LN", "DET_35", True),
         dac("R", "DACR_ADR", "OUT_RP", "OUT_RN", "DET_44", False),
-        ("Headphone jacks: both share the outputs; 3.5 mm takes L+ and R+ only. HP_GND joins GND at the jacks", [
-            Part("dap", "dap:AudioJack_3.5_TRRS", "PJ-342",
-                 {"T": "OUT_LP", "TS": "DET_35", "R1": "OUT_RP", "R2": "HP_GND", "S": "HP_GND"}, lcsc="C668606",
-                 note="footprint from the PJ-342 drawing in stage 3"),
-            Part("dap", "dap:AudioJack_4.4", "4.4mm balanced",
-                 {"T": "OUT_LP", "R1": "OUT_LN", "R2": "OUT_RP", "R3": "OUT_RN", "S": "HP_GND", "DET": "DET_44"},
-                 note="bought separately and hand-soldered; footprint from its drawing"),
+        ("Headphone jacks, both on the back of the board: they share the outputs; 3.5 mm takes L+ and R+ only. HP_GND joins GND at the jacks", [
+            Part("dap", "dap:PJ-342", "PJ-342",
+                 {"T": "OUT_LP", "TSW": "DET_35", "R": "OUT_RP", "S": "HP_GND"}, lcsc="C668606", nc=["RSW"],
+                 note="TSW touches the tip contact (OUT_LP) while no plug is in and is left floating by a "
+                      "plug: the opposite of Cirrus's scheme, so the firmware sets HPDETECT_INV. Hand-soldered"),
+            Part("dap", "dap:KH-PJ-44002", "KH-PJ-44002-12DBAP-A",
+                 {"L+": "OUT_LP", "L-": "OUT_LN", "R+": "OUT_RP", "R-": "OUT_RN", "S": "HP_GND",
+                  "SW_A": "DET_44", "SW_B": "GND"}, lcsc="C42396781",
+                 note="its plug switch pulls DET_44 to ground; whether a plug opens or closes it is set "
+                      "with HPDETECT_INV once tried. Bought separately and hand-soldered"),
             Part("NT", "Device:NetTie_2", "NetTie", {"1": "HP_GND", "2": "GND"},
                  "NetTie:NetTie-2_SMD_Pad0.5mm"),
         ]),
@@ -786,8 +818,8 @@ def write_root(root_uuid, pages):
         ("Generated by tools/make_schematic.py from the plan in docs/pcb_plan.md. Change the script, not the sheets.",
          25.4, 35.56, 1.8),
         ("Sheets connect through global labels with the same name; supply nets use power symbols.", 25.4, 40.64, 1.8),
-        ("Not final: connector footprints (FPCs, microSD, jacks) are stand-ins until the layout stage.", 25.4, 45.72,
-         1.8),
+        ("Footprints are the chosen parts' own (see docs/pcb_plan.md); both headphone jacks sit on the back.",
+         25.4, 45.72, 1.8),
     ]
     for s, nx, ny, size in notes:
         items.append(["text", Q(s), ["exclude_from_sim", "no"], ["at", nx, ny, 0], K.font(size, justify="left"),

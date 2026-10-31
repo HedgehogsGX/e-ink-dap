@@ -1,0 +1,183 @@
+(footprint "Jack_4.4mm_KH-PJ-44002-12DBAP-A"
+	(version 20240108)
+	(generator "make_pcb")
+	(layer "F.Cu")
+	(descr "Kinghelm KH-PJ-44002-12DBAP-A 4.4 mm 5-pole jack, 12 pins: 1/6 ground, 2/7 R-, 3/8 R+, 4/9 L-, 5/10 L+, 11/12 plug switch; axis 2.5 mm above its seat, 2.8 mm nose")
+	(property "Reference" "REF**"
+		(at 0 -1.2 0)
+		(layer "F.SilkS")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Jack_4.4mm_KH-PJ-44002-12DBAP-A"
+		(at 0 20.3 0)
+		(layer "F.Fab")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_rect
+		(start -4.3 0)
+		(end 4.3 19.1)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+	)
+	(fp_rect
+		(start -3.25 0)
+		(end 3.25 18.25)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+	)
+	(pad "1" thru_hole oval
+		(at 2.725 1.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "2" thru_hole oval
+		(at 2.725 4.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "3" thru_hole oval
+		(at 2.725 7.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "4" thru_hole oval
+		(at 2.725 10.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "6" thru_hole oval
+		(at -2.725 1.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "7" thru_hole oval
+		(at -2.725 4.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "8" thru_hole oval
+		(at -2.725 7.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "9" thru_hole oval
+		(at -2.725 10.75)
+		(size 0.95 2.15)
+		(drill oval 0.55 1.75)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "5" thru_hole oval
+		(at 2.525 14.7)
+		(size 0.95 1.95)
+		(drill oval 0.55 1.55)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "10" thru_hole oval
+		(at -2.525 16)
+		(size 0.95 1.95)
+		(drill oval 0.55 1.55)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "11" thru_hole oval
+		(at -3.575 12.95)
+		(size 0.95 1.95)
+		(drill oval 0.55 1.55)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "12" thru_hole oval
+		(at 0 18.38)
+		(size 1.95 0.95)
+		(drill oval 1.55 0.55)
+		(layers "*.Cu" "*.Mask")
+	)
+	(fp_poly
+		(pts
+			(xy 1.05 9)
+			(xy -1.05 9)
+			(xy -1.05 13.3)
+			(xy -2.6 13.3)
+			(xy -2.6 14.5)
+			(xy -1.6 14.5)
+			(xy -1.6 17.45)
+			(xy 1.05 17.45)
+		)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+	)
+	(zone
+		(net 0)
+		(net_name "")
+		(layers "F.Cu" "In1.Cu" "In2.Cu" "In3.Cu" "In4.Cu" "B.Cu")
+		(name "cut-out keep-out")
+		(hatch edge 0.5)
+		(connect_pads
+			(clearance 0)
+		)
+		(min_thickness 0.25)
+		(filled_areas_thickness no)
+		(keepout
+			(tracks not_allowed)
+			(vias not_allowed)
+			(pads allowed)
+			(copperpour not_allowed)
+			(footprints allowed)
+		)
+		(fill
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+		)
+		(polygon
+			(pts
+				(xy 1.25 8.8)
+				(xy -1.25 8.8)
+				(xy -1.25 13.1)
+				(xy -2.8 13.1)
+				(xy -2.8 14.7)
+				(xy -1.8 14.7)
+				(xy -1.8 17.65)
+				(xy 1.25 17.65)
+			)
+		)
+	)
+	(model "${KIPRJMOD}/3d/Jack_4.4mm_KH-PJ-44002-12DBAP-A.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

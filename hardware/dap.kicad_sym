@@ -1862,163 +1862,7 @@
 			)
 		)
 	)
-	(symbol "AudioJack_3.5_TRRS"
-		(pin_names
-			(offset 1.016)
-		)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(property "Reference" "J"
-			(at 0 10.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "AudioJack_3.5_TRRS"
-			(at 0 -10.16 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "dap:Jack_3.5mm_PJ-342_standin"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "3.5 mm jack, 4 poles + tip-detect switch (PJ-342); pin numbers follow the part's drawing"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(symbol "AudioJack_3.5_TRRS_0_1"
-			(rectangle
-				(start -5.08 7.62)
-				(end 5.08 -7.62)
-				(stroke
-					(width 0.254)
-					(type default)
-				)
-				(fill
-					(type background)
-				)
-			)
-		)
-		(symbol "AudioJack_3.5_TRRS_1_1"
-			(pin passive line
-				(at -7.62 5.08 0)
-				(length 2.54)
-				(name "T"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "4"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -7.62 2.54 0)
-				(length 2.54)
-				(name "TS"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "5"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -7.62 0 0)
-				(length 2.54)
-				(name "R1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "3"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -7.62 -2.54 0)
-				(length 2.54)
-				(name "R2"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "2"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -7.62 -5.08 0)
-				(length 2.54)
-				(name "S"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-		)
-	)
-	(symbol "AudioJack_4.4"
+	(symbol "PJ-342"
 		(pin_names
 			(offset 1.016)
 		)
@@ -2033,7 +1877,7 @@
 				)
 			)
 		)
-		(property "Value" "AudioJack_4.4"
+		(property "Value" "PJ-342"
 			(at 0 -10.16 0)
 			(effects
 				(font
@@ -2041,7 +1885,7 @@
 				)
 			)
 		)
-		(property "Footprint" "dap:Jack_4.4mm_standin"
+		(property "Footprint" "dap:Jack_3.5mm_PJ-342"
 			(at 0 0 0)
 			(effects
 				(font
@@ -2059,7 +1903,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "4.4 mm balanced jack (Pentaconn order T L+, R1 L-, R2 R+, R3 R-, S GND) with detect"
+		(property "Description" "3.5 mm stereo jack, SHOU HAN PJ-342: tip 3 and ring 6, each with a switch that is closed while no plug is in (4, 7); 5 and 2 touch the sleeve end of the plug"
 			(at 0 0 0)
 			(effects
 				(font
@@ -2068,7 +1912,7 @@
 				(hide yes)
 			)
 		)
-		(symbol "AudioJack_4.4_0_1"
+		(symbol "PJ-342_0_1"
 			(rectangle
 				(start -5.08 10.16)
 				(end 5.08 -7.62)
@@ -2081,47 +1925,11 @@
 				)
 			)
 		)
-		(symbol "AudioJack_4.4_1_1"
+		(symbol "PJ-342_1_1"
 			(pin passive line
 				(at -7.62 7.62 0)
 				(length 2.54)
 				(name "T"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -7.62 5.08 0)
-				(length 2.54)
-				(name "R1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "2"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at -7.62 2.54 0)
-				(length 2.54)
-				(name "R2"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2137,9 +1945,9 @@
 				)
 			)
 			(pin passive line
-				(at -7.62 0 0)
+				(at -7.62 5.08 0)
 				(length 2.54)
-				(name "R3"
+				(name "TSW"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2147,6 +1955,42 @@
 					)
 				)
 				(number "4"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 2.54 0)
+				(length 2.54)
+				(name "R"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "6"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 0 0)
+				(length 2.54)
+				(name "RSW"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "7"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2175,7 +2019,253 @@
 			(pin passive line
 				(at -7.62 -5.08 0)
 				(length 2.54)
-				(name "DET"
+				(name "S"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+	)
+	(symbol "KH-PJ-44002"
+		(pin_names
+			(offset 1.016)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "J"
+			(at 0 20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "KH-PJ-44002"
+			(at 0 -17.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "dap:Jack_4.4mm_KH-PJ-44002-12DBAP-A"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "4.4 mm balanced jack, Kinghelm KH-PJ-44002-12DBAP-A: two pins per pole in Pentaconn order (tip L+, L-, R+, R-, sleeve ground) and a separate plug switch 11-12"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "KH-PJ-44002_0_1"
+			(rectangle
+				(start -5.08 17.78)
+				(end 5.08 -15.24)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type background)
+				)
+			)
+		)
+		(symbol "KH-PJ-44002_1_1"
+			(pin passive line
+				(at -7.62 15.24 0)
+				(length 2.54)
+				(name "L+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "5"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 12.7 0)
+				(length 2.54)
+				(name "L+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "10"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 10.16 0)
+				(length 2.54)
+				(name "L-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "4"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 7.62 0)
+				(length 2.54)
+				(name "L-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "9"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 5.08 0)
+				(length 2.54)
+				(name "R+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "3"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 2.54 0)
+				(length 2.54)
+				(name "R+"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "8"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 0 0)
+				(length 2.54)
+				(name "R-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 -2.54 0)
+				(length 2.54)
+				(name "R-"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "7"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 -5.08 0)
+				(length 2.54)
+				(name "S"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 -7.62 0)
+				(length 2.54)
+				(name "S"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2183,6 +2273,42 @@
 					)
 				)
 				(number "6"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 -10.16 0)
+				(length 2.54)
+				(name "SW_A"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "11"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at -7.62 -12.7 0)
+				(length 2.54)
+				(name "SW_B"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "12"
 					(effects
 						(font
 							(size 1.27 1.27)

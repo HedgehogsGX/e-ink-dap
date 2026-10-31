@@ -1,0 +1,148 @@
+(footprint "microSD_TF-01A"
+	(version 20240108)
+	(generator "make_pcb")
+	(layer "F.Cu")
+	(descr "Hroparts TF-01A push-push microSD socket (LCSC C91145; pads as in JLCPCB's EasyEDA library, https://easyeda.com). Card mouth towards +y; pad CD is the unused card-detect contact")
+	(property "Reference" "REF**"
+		(at 0 -7.4 0)
+		(layer "F.SilkS")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "microSD_TF-01A"
+		(at 0 11.1 0)
+		(layer "F.Fab")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_rect
+		(start -8.6 -6.2)
+		(end 8.6 9.9)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+	)
+	(fp_rect
+		(start -7 -4.6)
+		(end 7 9.675)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+	)
+	(pad "1" smd roundrect
+		(at 2.24 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "2" smd roundrect
+		(at 1.14 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "3" smd roundrect
+		(at 0.04 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "4" smd roundrect
+		(at -1.06 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "5" smd roundrect
+		(at -2.16 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "6" smd roundrect
+		(at -3.26 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "7" smd roundrect
+		(at -4.36 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "8" smd roundrect
+		(at -5.46 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "CD" smd roundrect
+		(at -6.56 -5.276)
+		(size 0.6 1.3)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "SH" smd roundrect
+		(at -7.76 -4.426)
+		(size 1.2 1.4)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "SH" smd roundrect
+		(at 6.92 -4.426)
+		(size 1.2 1.4)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "SH" smd roundrect
+		(at -7.76 5.276)
+		(size 1.2 2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "SH" smd roundrect
+		(at 7.76 5.276)
+		(size 1.2 2)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.25)
+	)
+	(pad "" np_thru_hole circle
+		(at -4.95 5.566)
+		(size 1 1)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+	)
+	(pad "" np_thru_hole circle
+		(at 3.05 5.566)
+		(size 1 1)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+	)
+	(model "${KIPRJMOD}/3d/microSD_TF-01A.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
