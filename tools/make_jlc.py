@@ -6,7 +6,7 @@ hardware/jlcpcb/, and checks whether the board is ready to order:
 
 Run tools/make_schematic.py and tools/make_pcb.py first.
 
-- dap-gerbers.zip: Gerbers (4 copper layers, mask, paste, silkscreen, outline) and drill
+- dap-gerbers.zip: Gerbers (6 copper layers, mask, paste, silkscreen, outline) and drill
   files. Named dap-gerbers-DRAFT.zip while anything below blocks ordering.
 - dap-bom.csv: JLCPCB's BOM columns (Comment, Designator, Footprint, LCSC Part #).
 - dap-cpl.csv: JLCPCB's placement columns (Designator, Mid X, Mid Y, Layer, Rotation).
@@ -34,8 +34,8 @@ BOARD = os.path.join(HW, "dap.kicad_pcb")
 SCH = os.path.join(HW, "dap.kicad_sch")
 CLI = "/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli"
 
-LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu", "F.Paste", "B.Paste", "F.Silkscreen", "B.Silkscreen",
-          "F.Mask", "B.Mask", "Edge.Cuts"]
+LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu", "F.Paste", "B.Paste", "F.Silkscreen",
+          "B.Silkscreen", "F.Mask", "B.Mask", "Edge.Cuts"]
 NOT_ASSEMBLED = {"J1": "battery wires, soldered to the pads on the back by hand",
                  "J6": "3.5 mm jack PJ-342 (C668606), on the back: soldered by hand (JLCPCB's Economic "
                        "assembly is one side only, and it lists this jack as hand-soldered anyway)",
@@ -51,10 +51,12 @@ TO_CONFIRM = ["stock: JLCPCB had no CS43131-CNZR (C965907) on 2026-10-31 - pre-o
               "e-paper ribbon's), so they face the bottom-contact connector once folded under the panel",
               "plug detect: the 3.5 mm jack's switch opens when a plug goes in, the 4.4 mm jack's is "
               "unknown - the firmware sets HPDETECT_INV for each after a try"]
-ORDER = ["4 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers)",
+ORDER = ["6 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers); layer order top, ground, signal, "
+         "signal, ground, bottom (the Gerbers' file names: F_Cu, In1_Cu ... In4_Cu, B_Cu)",
          "surface finish: ENIG (flat pads for the 0.4 mm-pitch QFNs)",
-         "impedance control on, a JLCPCB 4-layer 1.2 mm stackup: USB pair 0.2 mm / 0.2 mm gap,"
-         " about 90 ohm differential over layer 2 - check with JLCPCB's impedance calculator",
+         "impedance control on, JLCPCB's 6-layer 1.2 mm stackup: USB pairs 0.2 mm / 0.2 mm gap on the top"
+         " and bottom layers, about 90 ohm differential over the ground planes 0.1 mm away (layers 2 and 5)"
+         " - check with JLCPCB's impedance calculator",
          "min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; the ESP32 footprint's thermal vias are 0.2 mm",
          "plated slots 0.55 mm wide for the 4.4 mm jack, and one cut-out through the board under it",
          "vias tented (covered with solder mask)",

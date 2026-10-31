@@ -1,7 +1,4 @@
-NOT READY TO ORDER - the files are a draft
-
-Blocks ordering:
-  - 32 connections are not routed yet
+READY TO ORDER
 
 Check before ordering, or when the boards arrive (docs/pcb_plan.md):
   - stock: JLCPCB had no CS43131-CNZR (C965907) on 2026-10-31 - pre-order 4 into your JLCPCB parts inventory before the order; LCSC had only 40 of the 10 uH inductor (C354566)
@@ -9,9 +6,9 @@ Check before ordering, or when the boards arrive (docs/pcb_plan.md):
   - plug detect: the 3.5 mm jack's switch opens when a plug goes in, the 4.4 mm jack's is unknown - the firmware sets HPDETECT_INV for each after a try
 
 Order settings:
-  - 4 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers)
+  - 6 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers); layer order top, ground, signal, signal, ground, bottom (the Gerbers' file names: F_Cu, In1_Cu ... In4_Cu, B_Cu)
   - surface finish: ENIG (flat pads for the 0.4 mm-pitch QFNs)
-  - impedance control on, a JLCPCB 4-layer 1.2 mm stackup: USB pair 0.2 mm / 0.2 mm gap, about 90 ohm differential over layer 2 - check with JLCPCB's impedance calculator
+  - impedance control on, JLCPCB's 6-layer 1.2 mm stackup: USB pairs 0.2 mm / 0.2 mm gap on the top and bottom layers, about 90 ohm differential over the ground planes 0.1 mm away (layers 2 and 5) - check with JLCPCB's impedance calculator
   - min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; the ESP32 footprint's thermal vias are 0.2 mm
   - plated slots 0.55 mm wide for the 4.4 mm jack, and one cut-out through the board under it
   - vias tented (covered with solder mask)
@@ -25,7 +22,7 @@ Not assembled by JLCPCB:
   - TP2: test pad
   - NT1: net tie: copper only
 
-Files: dap-gerbers-DRAFT.zip (14 files: dap-B_Cu.gbl, dap-B_Mask.gbs, dap-B_Paste.gbp, dap-B_Silkscreen.gbo, dap-Edge_Cuts.gm1, dap-F_Cu.gtl, dap-F_Mask.gts, dap-F_Paste.gtp, dap-F_Silkscreen.gto, dap-In1_Cu.g1, dap-In2_Cu.g2, dap-NPTH.drl, dap-PTH.drl, dap-job.gbrjob),
+Files: dap-gerbers.zip (16 files: dap-B_Cu.gbl, dap-B_Mask.gbs, dap-B_Paste.gbp, dap-B_Silkscreen.gbo, dap-Edge_Cuts.gm1, dap-F_Cu.gtl, dap-F_Mask.gts, dap-F_Paste.gtp, dap-F_Silkscreen.gto, dap-In1_Cu.g1, dap-In2_Cu.g2, dap-In3_Cu.g3, dap-In4_Cu.g4, dap-NPTH.drl, dap-PTH.drl, dap-job.gbrjob),
 dap-bom.csv (57 lines), dap-cpl.csv (151 parts).
 In JLCPCB's placement preview, check each part's rotation: some library parts are
 drawn turned 90 or 180 degrees from KiCad's footprints.
