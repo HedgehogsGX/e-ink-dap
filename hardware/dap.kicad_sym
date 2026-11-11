@@ -174,7 +174,7 @@
 					)
 				)
 			)
-			(pin output line
+			(pin passive line
 				(at -20.32 15.24 0)
 				(length 2.54)
 				(name "XTO"

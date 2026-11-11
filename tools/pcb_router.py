@@ -920,14 +920,17 @@ class Router:
         self.length[net] = 0.0
         self.failed.pop(net, None)
 
-    def route_all(self, plan, rounds=6, reach=2.0, log=print):
+    def route_all(self, plan, rounds=6, reach=2.0, log=print, done=()):
         """Routes plan, a list of (net, route_net options), in order. Then, up to `rounds`
         times and while it helps, each net still stuck gets a try at rip-up and reroute
-        (try_rip). Returns {net: [(pad name, (x, y), reason)]} still stuck."""
+        (try_rip). done: nets of the plan routed already (route_net, before the pins got
+        their vias): not routed again, but taken up and retried like the others. Returns
+        {net: [(pad name, (x, y), reason)]} still stuck."""
         opts, order = dict(plan), [n for n, _ in plan]
-        self.set_waiting(order)
+        self.set_waiting([n for n in order if n not in done])
         for net in order:
-            self.route_net(net, **opts[net])
+            if net not in done:
+                self.route_net(net, **opts[net])
         self.retry(opts, order, rounds, reach, log)
         return {n: v for n, v in self.failed.items() if v}
 

@@ -8,7 +8,7 @@
   audio.kicad_sch: one sheet per block of docs/pcb_plan.md
 - hardware/dap.kicad_sym + sym-lib-table: symbols KiCad doesn't ship (CS43131, GL823K,
   SN74AVC4T774, TPS61023, TPS2553, the two headphone jacks); fp-lib-table points at the
-  footprints KiCad doesn't have (jacks, microSD socket, battery pads), which
+  footprints KiCad doesn't have (jacks, microSD socket, battery and reset pads), which
   tools/make_pcb.py writes to hardware/dap.pretty
 
 The design (parts, values, connections) is the DESIGN table below; the drawing is
@@ -63,7 +63,7 @@ PASSIVES = {
     ("100nF", C0402): "C1525", ("1uF", C0402): "C52923", ("1uF", C0603): "C15849",
     ("1uF/50V", C0603): "C15849", ("2.2uF", C0603): "C23630", ("4.7uF", C0603): "C19666",
     ("10uF", C0805): "C15850", ("22uF", C0805): "C45783", ("4.7uF/50V", C0805): "C98192",
-    ("1.5uH", L3015): "C5291780", ("10uH", L3015): "C354566", ("1uH", L2520): "C354542",
+    ("2.2uH", L3015): "C354563", ("10uH", L3015): "C354566", ("1uH", L2520): "C354542",
     ("600R@100MHz", FB0603): "C85833",
 }
 
@@ -94,7 +94,7 @@ CUSTOM = {
                 "32-bit DAC with Class H headphone amp, Cirrus Logic, QFN-40",
                 [("31", "VL", "power_in"), ("4", "VD", "power_in"), ("7", "VA", "power_in"),
                  ("25", "VCP", "power_in"), ("26", "VP", "power_in"), "",
-                 ("37", "XTI/MCLK", "input"), ("36", "XTO", "output"), ("33", "CLKOUT", "output"), "",
+                 ("37", "XTI/MCLK", "input"), ("36", "XTO", "passive"), ("33", "CLKOUT", "output"), "",
                  ("34", "SCLK1", "bidirectional"), ("38", "LRCK1", "bidirectional"),
                  ("2", "SDIN1", "input"), ("32", "DSDCLK/SCLK2", "bidirectional"),
                  ("29", "DSDB/LRCK2", "bidirectional"), ("40", "DSDA/SDIN2", "input"), "",
@@ -206,14 +206,14 @@ def power_sheet():
             C("1uF", "VBUS", fp=C0603), C("10uF", "SYS"), C("10uF", "VBAT"),
             Part("J", "Connector_Generic:Conn_01x03", "Battery", {"1": "VBAT", "2": "GND", "3": "BAT_NTC"},
                  "dap:Battery_Pads_1x03",
-                 note="606090 cell with 10k NTC, wires soldered to pads on the back: a JST PH plug is too "
+                 note="806090 cell (5000 mAh) with 10k NTC, wires soldered to pads on the back: a JST PH plug is too "
                       "tall for the gap under the screen. Check the wire order before soldering"),
         ]),
-        ("3.3 V buck-boost: TPS63001, power-save mode on", [
+        ("3.3 V buck-boost: TPS63001, power-save mode on; 2.2 uH as in TI's circuit (1.6 A)", [
             Part("U", "Regulator_Switching:TPS63001", "TPS63001DRCR",
                  {"VIN": "SYS", "VINA": "SYS", "EN": "SYS", "PS/SYNC": "GND", "L1": "BB_L1", "L2": "BB_L2",
                   "VOUT": "+3V3", "FB": "+3V3", "GND": "GND", "PGND": "GND"}, lcsc="C28060"),
-            L("1.5uH", "BB_L1", "BB_L2", L3015),
+            L("2.2uH", "BB_L1", "BB_L2", L3015),
             C("10uF", "SYS"), C("100nF", "SYS"), C("22uF", "+3V3"), C("22uF", "+3V3"),
         ]),
         ("Audio rails: three LP5907 1.8 V LDOs (VA, VCP, VD+VL) and the filtered VP rail, off when AUDIO_EN is low", [
@@ -278,6 +278,11 @@ def mcu_sheet():
                  "C72043"),
             Part("TP", "Connector:TestPoint", "TX", {"1": "DEBUG_TX"}, "TestPoint:TestPoint_Pad_D1.0mm"),
             Part("TP", "Connector:TestPoint", "GND", {"1": "GND"}, "TestPoint:TestPoint_Pad_D1.0mm"),
+        ]),
+        ("Reset pads on the back, beside the battery pads: bridge them for a moment (tweezers) to restart the ESP32", [
+            Part("JP", "Jumper:SolderJumper_2_Open", "Reset", {"1": "ESP_EN", "2": "GND"}, "dap:Reset_Pads_1x02",
+                 note="the board has no power switch and the battery is soldered: this is the only hardware "
+                      "reset. Hold Play while bridging to start the firmware download mode. Never solder them shut"),
         ]),
     ]
 
@@ -374,7 +379,7 @@ def usb_storage_sheet():
 def dac(side, adr, out_a, out_b, detect, master):
     p = f"DAC{side}_"
     nets = {"VL": "1V8_D", "VD": "1V8_D", "VA": "1V8_A", "VCP": "1V8_CP", "VP": "VP",
-            "XTI/MCLK": "MCLK", "SCLK1": "SCLK_1V8", "LRCK1": "LRCK_1V8", "SDIN1": "SDIN_1V8",
+            "XTI/MCLK": "MCLK", "XTO": "GND", "SCLK1": "SCLK_1V8", "LRCK1": "LRCK_1V8", "SDIN1": "SDIN_1V8",
             "SCL": "I2C_SCL_1V8", "SDA": "I2C_SDA_1V8", "ADR": adr, "~{RESET}": "DAC_RST",
             "GNDD": "GND", "GNDA": "GND", "GNDCP": "GND", "EP": "GND",
             "FILT+": p + "FILTP", "FILT-": p + "FILTN", "-VA": p + "NVA", "FLYP_VA": p + "FLYP_VA",
@@ -387,9 +392,9 @@ def dac(side, adr, out_a, out_b, detect, master):
             C("2.2uF", "1V8_CP"), C("2.2uF", p + "VCPF_P"), C("2.2uF", p + "VCPF_N"),
             C("2.2uF", p + "FLYP_VCP", p + "FLYC_VCP"), C("2.2uF", p + "FLYC_VCP", p + "FLYN_VCP")]
     role = "I2S clock master" if master else "I2S clock slave"
-    return (f"CS43131 {side} ({role}, mono mode): HPOUTA = {out_a}, HPOUTB = {out_b}. Caps per Cirrus's typical connection diagram", [
+    return (f"CS43131 {side} ({role}, mono mode): HPOUTA = {out_a}, HPOUTB = {out_b}. Caps per Cirrus's typical connection diagram; XTO to ground (external clock)", [
         Part("dap", "dap:CS43131", "CS43131-CNZR", nets, lcsc="C965907",
-             nc=["XTO", "CLKOUT", "DSDCLK/SCLK2", "DSDB/LRCK2", "DSDA/SDIN2", "~{INT}", "HPINA", "HPINB", "TSO"]),
+             nc=["CLKOUT", "DSDCLK/SCLK2", "DSDB/LRCK2", "DSDA/SDIN2", "~{INT}", "HPINA", "HPINB", "TSO"]),
     ] + caps + ([R("4.99k", "DACR_ADR", "GND")] if adr == "DACR_ADR" else []))
 
 

@@ -23,4 +23,6 @@ hardware/*.lck
 
 # Freerouting (downloaded, see tools/make_pcb.py)
 tools/freerouting.nosync/
+# JLCPCB's footprints, fetched by tools/jlc_turns.py
+tools/easyeda.nosync/
 case/pcb.glb

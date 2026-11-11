@@ -7,13 +7,13 @@ routes it, then renders it in 3D. Run with KiCad's own Python, which has pcbnew:
 Run tools/make_schematic.py first: parts, footprints and nets come from the schematic's
 netlist. Pass --no-render to skip the pictures, --no-route to only place the parts (a quick
 look at the placement; the board file then has no tracks), --repair to only run the repair
-step on the saved board.
+step on the saved board, --freerouting to hand what ours couldn't join to Freerouting.
 
 - hardware/dap.kicad_pcb: 6 layers, 1.2 mm thick, outline and notch from tools/make_case.py,
   every part placed and routed (see Routing). Layers: 1 top (parts), 2 ground, 3 and 4
   signals, 5 ground, 6 bottom
 - hardware/dap.pretty: footprints KiCad doesn't have (the two jacks, the microSD socket,
-  battery pads), from the parts' drawings
+  battery pads, reset pads), from the parts' drawings
 - hardware/3d: simple 3D models for those, and for parts whose models KiCad doesn't ship
 - hardware/renders/pcb_*.png: top, bottom and angled views (kicad-cli pcb render)
 - case/pcb.glb: the board as a 3D model, which tools/make_case.py puts into the case
@@ -25,16 +25,18 @@ get to the pins it shares a net with, inside the group's area in AREA; parts bet
 pins of their chip first.
 
 Routing: tools/pcb_router.py gives every ground pad a via to the ground planes (layers 2
-and 5), every fine-pitch pin (and every pin of STUB_PARTS) a short escape stub and a via of
-its own (so no track can box it in), then routes the short local nets, ROUTES, POWER_ROUTES
-and the other nets in order on the four signal layers (the USB pairs on the top and bottom
-only), with trial rip-ups that are undone unless they help. Anything ours couldn't join goes
-to Freerouting (FREEROUTING, a Java program downloaded separately; skipped if it isn't
-there or nothing is left), with all of ours as fixed wiring, track widths from NETCLASSES.
-tidy() then removes dead ends, and whatever KiCad still finds open gets one more try with
-ours (repair). Last, layers 3 and 4 are filled with ground and the bottom layer's free area
-with 3.3 V, around the tracks. A full run takes about 20 minutes (Freerouting's log, input
-and output, when it runs: tools/freerouting.nosync/last-run.*).
+and 5) and every fine-pitch pin (and every pin of STUB_PARTS) a short escape stub, routes
+the nets of FIRST (the DACs' flying capacitors, which a neighbour's via would wall in), gives
+each stubbed pin a via of its own (so no track can box it in), then routes the short local
+nets, ROUTES, POWER_ROUTES and the other nets in order on the four signal layers (the USB
+pairs on the top and bottom only), with trial rip-ups that are undone unless they help.
+With --freerouting, anything ours couldn't join goes to Freerouting (FREEROUTING, a Java
+program downloaded separately; skipped if it isn't there or nothing is left), with all of
+ours as fixed wiring, track widths from NETCLASSES. Layers 3 and 4 are filled with ground
+and the bottom layer's free area with 3.3 V, around the tracks. tidy() then removes dead
+ends, and whatever KiCad still finds open gets one more try with ours (repair). A full run
+takes 10-20 minutes (Freerouting's log, input and output, when it runs:
+tools/freerouting.nosync/last-run.*).
 """
 import json
 import math
@@ -56,6 +58,9 @@ FP_LIB = os.path.join(HW, "dap.pretty")
 MODELS_3D = "/Applications/KiCad/KiCad.app/Contents/SharedSupport/3dmodels"
 RENDER = "--no-render" not in sys.argv
 ROUTE = "--no-route" not in sys.argv
+# Freerouting only when asked for: on this board its fan-out stage adds some 1,000 stubs and
+# vias of its own and it still left the connections ours had left (2026-11-11, twice)
+FREEROUTE = "--freerouting" in sys.argv
 
 # ---- Board shape and heights, from tools/make_case.py (keep in step with it)
 W, L, WALL, GAP, R_INNER, PCB_T = 65.0, 116.0, 1.8, 0.3, 1.5, 1.2
@@ -87,6 +92,8 @@ PLACE = {
     "J6": (X_35, FACE_35, 0, "B"), "J7": (X_44, FACE_44, 0, "B"),   # headphone jacks, under the board
     "J4": (X_USB, IY - 3.65, 180),                     # USB-C front 0.3 mm past the board edge
     "J1": (-4.0, 41.0, 0, "B"),                        # battery wires, back side, past the battery's end
+    "JP1": (7.7, 41.0, 0, "B"),                        # reset pads, back side, between the battery pads and
+                                                       # the 4.4 mm jack: reached with the back cover off
     "J2": (-0.4, PANEL_BOTTOM + 0.5 + 3.65, 0),        # e-paper FPC: mouth just inside the panel's edge,
                                                        # centred on the ribbon (0.4 mm left of the panel's centre)
     "J3": (-17.0, PANEL_BOTTOM + 0.5 + 4.4, 0),        # touch FPC
@@ -105,6 +112,15 @@ PLACE = {
 }
 for ref, (side, y) in KEYS.items():
     PLACE[ref] = (side * KEY_X, y, 90 * side)
+# Small parts in the column right of the ESP32, kept where the 2026-10-31 board had them. The
+# ESP32's own capacitors left this column on 2026-11-11 (now at its pin 2); packed afresh, the
+# I2C pull-ups landed against the module's pins and two connections could not be routed
+PLACE.update({
+    "R18": (-3.585, -6.525, 270), "R19": (-2.335, -6.525, 270),   # I2C pull-ups
+    "R20": (-3.125, -4.985, 0), "TP2": (-0.555, -7.9537, 180),    # charge LED resistor, ground test pad
+    "R9": (-1.335, -10.025, 90), "R17": (-0.085, -10.025, 90),    # AUDIO_EN pull-down, battery divider
+    "R16": (0.165, -12.025, 270), "C22": (1.405, -12.045, 90),
+})
 
 # Area each schematic group's small parts are packed into (x0, y0, x1, y1), by the group's
 # first part; groups not listed pack within 12 mm of their pins. Packed in this order.
@@ -117,7 +133,8 @@ AREA = [
     ("J4", (-8.0, 34.0, 8.0, 47.0)),
     ("U14", (-10.5, 16.5, 10.5, 23.5)),
     ("U3", (-9.5, 8.5, 9.5, 16.5)),
-    ("U8", (-4.6, -13.0, 4.6, 7.5)),
+    ("U8", (-24.3, -24.5, -19.6, -18.0)),              # its capacitors and the EN parts right below pins
+                                                       # 2 (3.3 V) and 3 (EN), clear of the antenna keep-out
     ("R8", (-4.6, -13.0, 4.6, 7.5)),
     ("R16", (-4.6, -13.0, 4.6, 7.5)),
     ("U1", (5.0, -1.5, 27.0, 11.5)),
@@ -187,7 +204,16 @@ POWER_ROUTES = [
     (["GL_3V3"], dict(order=["U12"], width=0.25, full_width=0.4, min_width=0.15)),
 ]
 SWITCHING = ["BB_L1", "BB_L2", "BST_SW", "EPD_SW"]   # no vias of their own on these: short loops
+# Routed before any pin gets a via: the CS43131s' charge-pump flying capacitors, pin to capacitor.
+# Their pins 23 and 24 sit between two pins that get vias (22 and 25, 0.4 mm away); with the
+# vias in first, the 1.8 V pin's via walled FLYP_VCP in at its pin, and the board only finished
+# when a later rip-up happened to free it (2026-11-11: at the right DAC it no longer did)
+FIRST = ["DACL_FLYP_VCP", "DACR_FLYP_VCP", "DACL_FLYC_VCP", "DACR_FLYC_VCP"]
 LOCAL_PIN_VIAS = True   # the short local nets' pins get vias too, where room is left
+# A pin of a longer net that finds no room for its via has its neighbours' vias taken back as
+# well, so both leave side by side on the top layer: at the left DAC the 1.8 V pin's via sat
+# right in front of the VP pin (2026-11-11)
+YIELD_ALL = True
 # Parts whose pins all get stubs and vias like a fine-pitch chip's: the FPC connectors, and the
 # ESP32 module, where most long lines start
 STUB_PARTS = ["J2", "J3", "U8"]
@@ -241,13 +267,16 @@ MODEL_BOXES = {
 BODY_ONLY = {"ESP32-S3-WROOM-1"}   # courtyard also covers the antenna keep-out (a rule area)
 COVERS_NOTCH = {"J7"}              # the 4.4 mm jack's face overhangs its notch
 THROUGH = {"J6", "J7"}             # back-side parts whose pins or pegs go through: top side kept clear too
+# Smallest hole, mm: JLCPCB's 6-layer price covers 0.3 mm and up. KiCad's footprints have 0.2 mm
+# thermal vias in their centre pads, which added ¥229 to the 5-board order (2026-10-31)
+MIN_HOLE = 0.3
 
 # JLCPCB's 6-layer limits (or near them); KiCad reads them from hardware/dap.kicad_dru
 DRC_RULES = """(version 1)
 # JLCPCB 6-layer board limits. Written by tools/make_pcb.py.
 (rule "clearance" (constraint clearance (min 0.1mm)))
 (rule "track width" (constraint track_width (min 0.1mm)))
-(rule "hole size" (constraint hole_size (min 0.2mm)))
+(rule "hole size" (constraint hole_size (min 0.3mm)))
 (rule "hole clearance" (constraint hole_clearance (min 0.2mm)))
 (rule "edge clearance" (constraint edge_clearance (min 0.3mm)))
 """
@@ -300,6 +329,11 @@ FOOTPRINTS = [
          pads=[(str(i + 1), 0, -2.5 + 2.5 * i, 3.0, 1.6) for i in range(3)],
          courtyard=(-1.8, 1.8, -3.6, 3.6), fab=(-1.5, 1.5, -3.3, 3.3), model=None,
          silk=[("+", -2.6, -2.5), ("-", -2.6, 0.0), ("T", -2.6, 2.5)]),
+    dict(name="Reset_Pads_1x02", attr="smd",
+         descr="Two bare pads 1 mm apart, 1 EN and 2 ground: bridge them for a moment to reset the ESP32",
+         pads=[("1", -1.25, 0, 1.5, 1.5), ("2", 1.25, 0, 1.5, 1.5)],
+         courtyard=(-2.3, 2.3, -1.05, 1.05), fab=(-2.0, 2.0, -0.75, 0.75), model=None,
+         silk=[("RST", 0.0, 1.9)]),
 ]
 
 
@@ -543,6 +577,8 @@ def build():
             net = pins.get((ref, pad.GetNumber()))
             if net:
                 pad.SetNet(nets[net])
+            if 0 < pad.GetDrillSize().x < mm(MIN_HOLE):   # thermal vias: same pad, bigger hole
+                pad.SetDrillSize(pcbnew.VECTOR2I(mm(MIN_HOLE), mm(MIN_HOLE)))
         if name in MODEL_SUBST or name in MODEL_BOXES:
             fp.Models().clear()
             model = pcbnew.FP_3DMODEL()
@@ -657,7 +693,7 @@ def build():
             placed.add(ref)
 
     title = pcbnew.PCB_TEXT(board)
-    title.SetText("E-ink DAP  v0.1\n2026-10-31")
+    title.SetText("E-ink DAP  v0.2\n2026-11-11")
     title.SetLayer(pcbnew.B_SilkS)
     title.SetMirrored(True)
     title.SetTextSize(pcbnew.VECTOR2I(mm(1.6), mm(1.6)))
@@ -732,13 +768,16 @@ def route(board, nets):
     print(f"route: {stubs} fine-pitch pins given an escape stub")
     if not r.bridge(code[USB_C_BRIDGE[0]], USB_C_BRIDGE[1]):
         print("    no room to bridge the USB-C D- pins")
+    first = [(code[n], dict(opts)) for names, opts in local for n in names if n in FIRST]
+    stuck_first = sum(r.route_net(net, **opts) for net, opts in first)
+    print(f"route: {len(first)} nets routed before the pin vias (FIRST), {stuck_first} connections not made")
     # A via for each stubbed pin (not on the USB pairs, which stay on the outer layers, nor the
-    # switching nodes): first the pins of nets that leave their chip, then, where room is left,
-    # those of the short local nets (giving way where a pin next to them found none); unused
-    # ones go again after routing
-    no_room = [p for group, yield_ in ((ROUTES + POWER_ROUTES + far, False), (local if LOCAL_PIN_VIAS else [], True))
-               for p in r.via_out(sorted(code[n] for names, _ in group for n in names if n not in USB_NETS + SWITCHING),
-                                  yield_to_stuck=yield_)]
+    # switching nodes, nor the nets routed already): first the pins of nets that leave their
+    # chip, then, where room is left, those of the short local nets (giving way where a pin next
+    # to them found none); unused ones go again after routing
+    no_room = [p for group, yield_ in ((ROUTES + POWER_ROUTES + far, YIELD_ALL), (local if LOCAL_PIN_VIAS else [], True))
+               for p in r.via_out(sorted(code[n] for names, _ in group for n in names
+                                         if n not in USB_NETS + SWITCHING + FIRST), yield_to_stuck=yield_)]
     print(f"route: {len(r.via_end)} chip pins given a via of their own; no room by "
           f"{', '.join(no_room) or 'none'}")
     jobs = []
@@ -747,7 +786,7 @@ def route(board, nets):
         if "partner" in opts:
             opts["partner"] = code[opts["partner"]]
         jobs += [(code[name], opts) for name in names]
-    stuck = r.route_all(jobs)
+    stuck = r.route_all(jobs, done={net for net, _ in first})
     unused = r.drop_unused_vias(keep_nets=set(stuck))   # Freerouting may use those of nets left open
     r.drop_unused_stubs()
     pieces = list(board.GetTracks())
@@ -769,15 +808,17 @@ def route(board, nets):
         add_zone(board, outline, layer, nets[net])
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     set_netclasses(board)
-    if stuck:
-        routed = autoroute(board, len(stuck))
+    if stuck and FREEROUTE:
+        autoroute(board, len(stuck))
+    elif stuck:
+        print(f"autoroute: {sum(len(v) for v in stuck.values())} connections left for the repair step "
+              "(Freerouting only with --freerouting)")
     else:
         print("autoroute: nothing left for Freerouting")
-        routed = True   # still tidied
     for layer, net in FILLS:
         add_zone(board, outline, layer, nets[net])
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
-    return routed
+    return True   # tidied and repaired whether or not Freerouting ran or worked
 
 
 def set_netclasses(board):

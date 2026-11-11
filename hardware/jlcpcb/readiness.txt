@@ -4,25 +4,65 @@ Check before ordering, or when the boards arrive (docs/pcb_plan.md):
   - stock: JLCPCB had no CS43131-CNZR (C965907) on 2026-10-31 - pre-order 4 into your JLCPCB parts inventory before the order; LCSC had only 40 of the 10 uH inductor (C354566)
   - touch ribbon: with the display facing up, its gold contacts must face up as well (like the e-paper ribbon's), so they face the bottom-contact connector once folded under the panel
   - plug detect: the 3.5 mm jack's switch opens when a plug goes in, the 4.4 mm jack's is unknown - the firmware sets HPDETECT_INV for each after a try
+  - charge timer (owner's decision, docs/pcb_plan.md, Power tree): R3 = 68 k stops a charge after 6.8 to 11.3 h depending on the chip, and the 5000 mAh cell needs about 7.5 to 8.5 h at 0.8 A - leave it (re-plug if the LED blinks), charge at about 1 A, or tie TMR to ground
+  - jacks: lay the Kinghelm 4.4 mm jack and a PJ-342 on a 1:1 print of the board before ordering if you can - their footprints come from the drawings, not from parts in hand
 
-Order settings:
+Order settings (jlcpcb.com):
   - 6 layers, 1.2 mm thick, 60.8 x 111.8 mm (outline in the Gerbers); layer order top, ground, signal, signal, ground, bottom (the Gerbers' file names: F_Cu, In1_Cu ... In4_Cu, B_Cu)
   - surface finish: ENIG (flat pads for the 0.4 mm-pitch QFNs)
-  - impedance control on, JLCPCB's 6-layer 1.2 mm stackup: USB pairs 0.2 mm / 0.2 mm gap on the top and bottom layers, about 90 ohm differential over the ground planes 0.1 mm away (layers 2 and 5) - check with JLCPCB's impedance calculator
-  - min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; the ESP32 footprint's thermal vias are 0.2 mm
+  - stackup JLC06121H-3313 (free; 1.14 mm finished): the USB pairs, 0.2 mm tracks 0.2 mm apart on the top and bottom layers, are about 90 ohm differential over the ground planes 0.0994 mm away (layers 2 and 5); no impedance tolerance needed
+  - min track / space 0.1 / 0.1 mm; vias 0.5 / 0.3 mm; no hole under 0.3 mm (smaller ones cost extra)
   - plated slots 0.55 mm wide for the 4.4 mm jack, and one cut-out through the board under it
-  - vias tented (covered with solder mask)
-  - quantity 5 boards, 2 assembled (Economic assembly, top side only)
+  - vias filled and capped (free on 6 layers; the chips' centre pads have thermal vias)
+  - quantity 5 boards, 2 assembled, top side only. 嘉立创 puts the ESP32 module on its standard line, which takes boards of 70 x 70 mm or more: 5 mm rails on the long edges, held by mouse-bite tabs, not V-cut (the ESP32 is flush with the left edge, the side keys 0.3 mm from both long edges)
+
+Ordering on 嘉立创 (jlc-smt.com) instead, its forms in Chinese:
+  PCB下单 - board order (member.jlc.com, after logging in):
+    - 上传文件 upload: dap-gerbers.zip
+    - 板子层数 layers: 6
+    - 板子数量 quantity: 5
+    - 确认生产稿 confirm production files: 需要（确认2次，收费3元）: you see their files before they start
+    - 出货方式 shipped as: 单片 at first; after the rails (SMT贴片 below) it reads 拼板 / 嘉立创帮拼, 7.08 x 11.18 cm
+    - 成品板厚 thickness: 1.2
+    - 板材选项 laminate: 不指定 TG135 (the default; the 0.2 mm hole option switches it to TG155)
+    - 外层铜厚 / 内层铜厚 copper outer / inner: 1oz / 0.5oz
+    - 层压顺序 layer order: 指定层压顺序: L1 dap-F_Cu.gtl, L2 dap-In1_Cu.g1, L3 dap-In2_Cu.g2, L4 dap-In3_Cu.g3, L5 dap-In4_Cu.g4, L6 dap-B_Cu.gbl
+    - 需要阻抗 stackup: JLC06121H-3313 (免费), and 接受差异 for its 1.14 mm: the USB pairs are drawn for its 0.0994 mm outer prepreg
+    - 阻抗管控 impedance tolerance: 无要求 (none)
+    - 嘉立创盘中孔 / 阻焊覆盖 vias: 需要 / 过孔塞树脂+过孔电镀盖帽 (filled and capped, the default)
+    - 焊盘喷镀 surface finish: 沉金 (ENIG), 1u"
+    - 最小孔径/外径 smallest hole: 0.3mm (免费)
+    - 四线低阻过孔 four-wire via test: 无要求 (the 0.2 mm hole option switches it on)
+    - 交期 lead time: 7-8天
+    - SMT贴片 assembly: 需要. It answers that boards under 7 x 7 cm need rails: 加工艺边，补足7*7cm, then 非常规人工拼板 (¥30): 没有示意图, 我有要求，需要邮票孔拼板, 每大片拼的小片数量 有要求 横向1 竖向1, 需要工艺边 5 mm, 阴阳拼板 不需要, 其他要求: the note below
+    - 其他要求 panel note: 不要V割，只用邮票孔：板边有贴片元件。1. 工艺边只加在两条长边（111.8mm）外，工艺边与板边之间铣出2mm槽；邮票孔不要伸入板内，板子外形保持60.8×111.8mm。2. 邮票孔避开以下范围（从顶层看，从有耳机座缺口的短边量起）：左长边20–28mm、32–40mm、54–74mm；右长边22–30mm、37–45mm（侧按键SW1–SW4离板边0.3mm，ESP32模块天线端与板边齐平）。各层铜皮离板边0.35mm。3. MARK点和定位孔加在工艺边上。
+    - 是否开钢网 stencil: 不需要 (set by itself: the assembly order makes its own)
+    - 确认订单方式 order confirmation: 手动确认订单: nothing is charged before you approve the final price
+    - 发货方式 / 快递 shipping: 不同交期订单一起发货; any free courier (优速快递 is the default)
+    - 收货地址 / 联系方式 address and contact: your 集运 warehouse in China
+    - 总价 price (2026-10-31): ¥378.22: 工程费 200, 喷镀 105.54, 拼板 30, 板费 29.68, 品质赔付 10, 确认生产稿 3; shipping free
+  SMT下单 - assembly order (jlc-smt.com, SMT在线下单, once the board order has passed review):
+    - 选择未发货PCB: the board order above
+    - BOM与坐标清单 -> 上传BOM和坐标: dap-bom-cn.csv and dap-cpl-cn.csv
+    - 元器件备货方式 how parts are supplied: 嘉立创代采代购 (JLC buys every part, CS43131 included)
+    - 贴片数量 boards assembled: 2
+    - 焊接层 sides: 只贴顶层 (top side only)
+    - 产品类型 type: 标准型 (standard): ESP32 modules don't go on the economic line (255 °C reflow), and with about 25 extended part types it is cheaper anyway (¥8 a type, economic ¥20); it needs the rails above
+    - 匹配选型方式 part matching: 自助匹配选型, free (their matching service is ¥50): every line has its 商品编号, check each one matched it, and that C965907, the CS43131, is bought for you
+    - 分板出货 snapping off the rails: optional: ¥10 + ¥2 a board
+    - price, estimated 2026-10-31: assembly about ¥420 (¥150 setup, ¥50 stencil, about 25 x ¥8, 1,304 joints x ¥0.01), parts about ¥470: with the boards about ¥1,280 in all
 
 Not assembled by JLCPCB:
   - J1: battery wires, soldered to the pads on the back by hand
-  - J6: 3.5 mm jack PJ-342 (C668606), on the back: soldered by hand (JLCPCB's Economic assembly is one side only, and it lists this jack as hand-soldered anyway)
+  - J6: 3.5 mm jack PJ-342 (C668606), on the back: soldered by hand (only the top side is assembled, and JLCPCB lists this jack as hand-soldered anyway)
   - J7: 4.4 mm jack Kinghelm KH-PJ-44002-12DBAP-A (C42396781), on the back: bought separately, soldered by hand
   - TP1: test pad
   - TP2: test pad
   - NT1: net tie: copper only
+  - JP1: reset pads on the back: bare copper, bridged with tweezers to restart the ESP32
 
 Files: dap-gerbers.zip (16 files: dap-B_Cu.gbl, dap-B_Mask.gbs, dap-B_Paste.gbp, dap-B_Silkscreen.gbo, dap-Edge_Cuts.gm1, dap-F_Cu.gtl, dap-F_Mask.gts, dap-F_Paste.gtp, dap-F_Silkscreen.gto, dap-In1_Cu.g1, dap-In2_Cu.g2, dap-In3_Cu.g3, dap-In4_Cu.g4, dap-NPTH.drl, dap-PTH.drl, dap-job.gbrjob),
-dap-bom.csv (57 lines), dap-cpl.csv (151 parts).
-In JLCPCB's placement preview, check each part's rotation: some library parts are
-drawn turned 90 or 180 degrees from KiCad's footprints.
+dap-bom.csv and dap-bom-cn.csv (57 lines), dap-cpl.csv and dap-cpl-cn.csv (151 parts).
+Rotations and positions are for JLCPCB's own footprints (tools/jlc_turns.json): 16 parts
+are turned from KiCad's (J3, L1, L2, Q1, U3, U4, U5, U6, U7, U9, U11, U12, U13, U14, U15, U16). Still look at pin 1 of every chip in
+JLCPCB's placement preview before approving it.

@@ -7,14 +7,18 @@ are from JLCPCB's parts library on 2026-10-25.
 **Stage 2, the schematic, is drawn (2026-10-26):** see [Schematic](#schematic-stage-2) at the
 end. It follows this plan with the changes listed there.
 
+**Reviewed and revised 2026-11-11 (board v0.2):** reset pads, the ESP32's capacitors at its
+supply pin, XTO grounded, a 2.2 µH inductor, and placement files in JLCPCB's own rotations:
+see [Review, 2026-11-11](#review-2026-11-11-board-v02) at the end.
+
 **Stages 3 and 4 done (2026-10-31): the board is 6 layers, 60.8 × 111.8 mm (case 65 × 116
 × 17.2 mm), every part has its real footprint and LCSC number, every net is routed and
 KiCad's DRC is clean.** The JLCPCB files are ready to order: see
 [JLCPCB files](#jlcpcb-files-stage-4); what changed to get there is under "Routing on 6
 layers" at the end.
 
-One board, 6 layers (4 until 2026-10-31), assembled by JLCPCB on **one side** (the side facing the screen), so it
-stays in their cheaper "Economic" assembly. Its outline comes from the case model
+One board, 6 layers (4 until 2026-10-31), assembled by JLCPCB on **one side** (the side facing the screen), on
+their standard line (see [JLCPCB files](#jlcpcb-files-stage-4)). Its outline comes from the case model
 (`tools/make_case.py`): 60.8 × 111.8 mm (since 2026-10-31), with a shallow notch for the
 4.4 mm jack and cut-outs for the two screw bosses.
 
@@ -84,7 +88,7 @@ flowchart LR
 ```mermaid
 flowchart TD
   VBUS["USB-C VBUS 5 V"] --> CHG["BQ24073 charger + power path<br/>input ≤ 1.0 A, charge 0.8 A"]
-  BAT["606090 battery<br/>3.0–4.2 V, 10 kΩ NTC"] <--> CHG
+  BAT["806090 battery<br/>3.0–4.2 V, 10 kΩ NTC"] <--> CHG
   CHG --> SYS["SYS 3.0–4.4 V"]
   SYS --> BB["TPS63001 buck-boost<br/>3V3, about 1 A"]
   SYS --> LDOA["LP5907 → 1V8_A<br/>VA ×2"]
@@ -108,13 +112,21 @@ flowchart TD
 | 5 V out | TPS61023 + TPS2553 | VBUS when the player powers a USB DAC | BOOST_EN |
 
 - **Charger settings:** input limit 1.0 A (R_ILIM = 1610 / 1.0 ≈ 1.6 kΩ), charge current 0.8 A
-  (R_ISET = 890 / 0.8 ≈ 1.1 kΩ): a full charge takes about 5–6 hours. It's a linear charger
-  in a closed case, so more current means more heat (about 1 W at 0.8 A).
+  (R_ISET = 890 / 0.8 ≈ 1.1 kΩ): a full charge of the 5000 mAh cell takes about 7.5–8.5 hours
+  (5–6 with the 4000 mAh cell these were chosen for). It's a linear charger in a closed case,
+  so more current means more heat (about 1 W at 0.8 A).
+- **⚠ Charge safety timer, open (2026-11-11):** R_TMR = 68 kΩ stops a charge after
+  10 × K_TMR × R_TMR: 9.1 hours typically, but K_TMR is 36–60 s/kΩ, so 6.8 hours on a chip at
+  the low end, less than the 5000 mAh cell needs. Charging then stops and the LED blinks at
+  2 Hz until USB is unplugged and plugged in again. A bigger resistor doesn't fix it (72 kΩ
+  is the most allowed). Choices: leave it and re-plug if it happens, charge at about 1 A
+  (R_ISET 887 Ω, more heat), or tie TMR to ground (no safety timer; the NTC and the cell's
+  own protection stay). Not changed yet: the owner decides.
 - **When the player powers a USB DAC,** BOOST_EN also puts the charger in standby (EN1 high,
   EN2 tied high), so it doesn't try to charge from its own 5 V. The 5 V boost and its
   switch are optional: leave them unassembled to save cost; the rest works without them.
 - **Battery life, rough:** 60–150 mA while playing (ESP32 mostly idle between buffer fills,
-  Wi-Fi off) → about 25–60 hours from 4000 mAh. Measured numbers come with the prototype.
+  Wi-Fi off) → about 30–80 hours from 5000 mAh. Measured numbers come with the prototype.
 
 ## Pin map (ESP32-S3-WROOM-1-N16R8)
 
@@ -176,6 +188,7 @@ the prototype) is reused for the Power key.
 | Side keys ×4 | Alps SKRTLAE010, side-push 4.5 × 3.4 × 3.3 mm | C110293 | 43,836 | $0.14 | |
 | 3.5 mm jack | PJ-342 (SHOU HAN) | C668606 | 71,732 | $0.18 | 3-pole stereo with a switch on tip and ring (closed while empty); 4.5 mm tall, so it sits **on the back** of the board and is **hand-soldered** |
 | Battery connector | ~~JST PH 3-pin, right angle (S3B-PH-SM4-TB)~~ → 3 solder pads on the back | — | — | — | Changed in the placement draft: the JST PH is too tall for the 3.3 mm gap under the screen and has no room beside the jacks. Battery since 2026-10-31: **806090, 5000 mAh, 3 wires with 10 kΩ NTC** |
+| Reset pads | 2 bare pads on the back, `JP1` (EN, ground), marked RST | — | — | — | Added 2026-11-11: bridge them for a moment to restart the ESP32; see Review |
 | **4.4 mm jack** | **Kinghelm KH-PJ-44002-12DBAP-A** (slim, 12 pins, plug switch) | C42396781 | 0 | — | Chosen 2026-10-31 for its full drawing. Not stocked by JLCPCB: **buy it** (Taobao 金航标 or LCSC) and hand-solder it **on the back** of the board. 21 mm long with its nose. |
 | USB-C, 16-pin | TYPE-C-31-M-12 (top mount) | C165948 | 283,819 | $0.19 | Top-mount kept; since 2026-10-31 the case puts every port's hole at its own part's height |
 | E-paper booster | Good Display reference circuit | — | — | — | inductor, N-MOSFET, 3 Schottky diodes, 0.47 Ω, ~10 × 1 µF/25 V; values from the panel's spec in stage 2 |
@@ -207,9 +220,13 @@ roughly $40–75 per order on top of the parts, board and assembly.
 3. ✅ **Battery:** three solder pads on the back; the battery is now an **806090, 5000 mAh,
    3 wires with a 10 kΩ NTC** (owner's choice, 2026-10-31).
 4. ✅ **Optional 5 V output:** kept on the board (2026-10-26).
-5. **Wi-Fi/Bluetooth range will be poor:** the battery's foil sits right under the module's
-   antenna. Fine if wireless is only for occasional use; otherwise use the WROOM-1U module
-   with a small stick-on antenna. Still the owner's call before ordering.
+5. ✅ **Wi-Fi/Bluetooth antenna (2026-10-31): keep the WROOM-1 and its PCB antenna for the
+   first order** (owner's choice). Its range will be poor, since the battery's foil sits
+   right under the antenna, but wireless is only for firmware updates and the clock: music
+   and books come over USB, and the ESP32-S3 has no Bluetooth audio for headphones. The
+   WROOM-1U with a stick-on antenna doesn't fix it in this case either: the only metal-free
+   spot, above the screen, is next to the jacks and DACs. Measure the range on the first
+   boards; if it is too short, the WROOM-1U goes into the next revision.
 6. ✅ Settled in stage 2: the e-paper booster values, the headphone-detect wiring and the
    GL823K power. Checked 2026-10-31 against the datasheets: see below.
 
@@ -217,7 +234,7 @@ roughly $40–75 per order on top of the parts, board and assembly.
 
 Drawn 2026-10-26 in `hardware/` (KiCad 10): open `hardware/dap.kicad_pro`, or read
 `hardware/dap_schematic.pdf`. Six pages: the top sheet, then Power, MCU, Display, USB and
-storage, Audio. 158 parts, 126 nets.
+storage, Audio. 158 parts, 125 nets (2026-11-11).
 
 The sheets are generated by `tools/make_schematic.py` from one table of parts and
 connections, so edit that and re-run (`python3 tools/make_schematic.py`) rather than
@@ -298,18 +315,21 @@ The real FPC positions also depend on where the panel's and touch film's ribbons
 
 Started 2026-10-26, finished 2026-10-31. `tools/make_pcb.py` routes in three steps, all part
 of the same script, so everything is redone whenever the schematic or the placement changes
-(a full run takes about 20 minutes):
+(a full run takes 10–20 minutes):
 
 1. **Its own router** (`tools/pcb_router.py`) routes every net: 45° tracks on the four signal
    layers (1, 3, 4 and 6; the USB pairs on 1 and 6 only), through vias 0.5/0.3 mm, clearances
    checked on a 0.025 mm grid. First a via beside every ground pin and a short escape stub
    out of every fine-pitch pin (chips, the two FPC connectors and every pin of the ESP32
-   module). Then each such pin gets **a via of its own** a short way out, taken round each
-   chip in turn so they stagger: first the pins of nets that leave their chip, then, where
-   room is left, the local nets' pins (a pin that finds no room has its local neighbours'
-   vias taken back, so they leave side by side on the top layer). A track routed early can
-   then never wall a pin in, which is what kept the 4-layer board from finishing. Then the
-   short local nets (a chip and its capacitors, feedback dividers: pins within 8 mm), USB,
+   module). Since 2026-11-11 the DACs' charge-pump flying capacitors are routed next, pin to
+   capacitor (`FIRST`), before any pin has a via. Then each such pin gets **a via of its
+   own** a short way out, taken round each chip in turn so they stagger: first the pins of
+   nets that leave their chip, then, where room is left, the local nets' pins (a pin that
+   finds no room has its neighbours' vias taken back, so they leave side by side on the top
+   layer; since 2026-11-11 for every pin, `YIELD_ALL`, not only the local nets'). A track
+   routed early can then never wall a pin in, which is what kept the 4-layer board from
+   finishing. Then the short local nets (a chip and its capacitors, feedback dividers: pins
+   within 8 mm), USB,
    audio, power and all other nets, in that order. Each search is A* **guided by the true
    distance to its goal through free space** (Dijkstra over the search window, in SciPy), so
    it goes straight round obstacles; before, long searches ran out of steps. Each net still
@@ -319,11 +339,13 @@ of the same script, so everything is redone whenever the schematic or the placem
    goes back exactly as it was. Rounds of this go on while they help. Pin vias left unused
    are taken away. Strips above and below each CS43131 are reserved channels: only its
    headphone nets above, only its I2S, clock and I2C below.
-2. **Freerouting** (2.5.0, the Java version: `tools/freerouting.nosync/freerouting-2.5.0.jar`,
-   downloaded from its GitHub release and checked against the published SHA-256, run with
-   its usage statistics off; not in git) for anything still unrouted, with all of ours as
-   fixed wiring (since 2026-10-31: allowed to redo ours, it undid more than it added). Skipped
-   when nothing is left, as now.
+2. **Freerouting, only with `--freerouting`** (since 2026-11-11; 2.5.0, the Java version:
+   `tools/freerouting.nosync/freerouting-2.5.0.jar`, downloaded from its GitHub release and
+   checked against the published SHA-256, run with its usage statistics off; not in git) for
+   anything still unrouted, with all of ours as fixed wiring (since 2026-10-31: allowed to
+   redo ours, it undid more than it added). Not needed on the current board, and no longer
+   run by default: twice on 2026-11-11 it added about 1,000 fan-out stubs and vias of its own
+   and still left the connection ours had left.
 3. **Clean-up and repair:** neck-downs below 0.1 mm are widened, dead-end tracks and vias
    are removed one at a time, each removal kept only if KiCad's count of unrouted
    connections stays the same (a track with one open end can still carry another that ends
@@ -337,12 +359,15 @@ of the same script, so everything is redone whenever the schematic or the placem
   pads (4 under the charger), and the CS43131's ground pins tied into their own centre pad.
 - **USB, routed first** (the socket's pins leave no room to spare): D+/D− from the socket
   through the ESD chip to the USB switch as a pair, 0.2 mm tracks 0.2 mm apart, on the top
-  and bottom layers only (about 90 Ω over the ground plane 0.1 mm away; check with JLCPCB's
-  impedance calculator for the 6-layer stackup), then on to the
+  and bottom layers only (about 90 Ω over the ground plane 0.0994 mm away in JLCPCB's
+  free stackup JLC06121H-3313), then on to the
   card reader and the ESP32. The socket's two D− pins straddle a D+ pin, so they are
-  joined on the bottom layer. CC1/CC2 to the TUSB320L. Pair lengths: 70/75 mm to the switch
-  (4.5 mm apart, about 30 ps: more than USB 2.0 layout guides like, small next to a 2 ns
-  bit), 18/17 mm to the card reader, 9/11 mm to the ESP32.
+  joined on the bottom layer. CC1/CC2 to the TUSB320L. Pair lengths (track copper, board
+  v0.2): 70/77 mm from the socket to the switch, the bridge between the socket's D− pins
+  included (6.5 mm apart; 4.6 on the board of 2026-10-31), then 18/17 mm on to the card
+  reader, D+ the longer, so the card reader's whole high-speed path is about 5 mm apart,
+  about 30 ps: more than USB 2.0 layout guides like (about 4 mm), small next to a 2 ns bit.
+  9/11 mm to the ESP32, whose USB is full speed only.
 - **Audio:** master clock (kept 0.2 mm from other nets), the four headphone outputs
   (0.3 mm wide where there is room), headphone ground (0.5 mm) to both jacks and the net
   tie, jack detect, I2S on both sides of the level shifter, oscillator select.
@@ -356,7 +381,8 @@ of the same script, so everything is redone whenever the schematic or the placem
 - **Check (2026-10-31):** every connection routed; KiCad's DRC finds no clearance, width,
   edge, dangling or unconnected problems (the only reports are inside KiCad's own footprint
   for the side keys, whose peg sits close to its pads, and four silkscreen notes at the
-  board edge). 395 vias, 3.5 m of track, nothing narrower than 0.15 mm. The side keys' two
+  board edge). 395 vias, 3.5 m of track, nothing narrower than 0.15 mm (board v0.2,
+  2026-11-11: the same check, 394 vias, 3.5 m). The side keys' two
   pads "1" (joined inside the switch) are also joined by a track, as KiCad asks.
   History: on 2026-10-27, on 4 layers, 28 connections were left.
 
@@ -400,18 +426,58 @@ the BOM (`dap-bom.csv`, JLCPCB's columns) and the placement file (`dap-cpl.csv`)
 anything blocks it, the zip is named `dap-gerbers-DRAFT.zip`.
 
 - **Order settings:** 6 layers, 1.2 mm, 60.8 × 111.8 mm; **ENIG** finish (flat pads for the
-  0.4 mm-pitch QFNs; HASL is too uneven for them); impedance control with JLCPCB's 6-layer
-  1.2 mm stackup for the USB pairs; tracks/gaps 0.1 mm; vias 0.5/0.3 mm, tented; parts on
-  the top side only.
-- **Not assembled by JLCPCB:** the 4.4 mm jack (hand-soldered), the battery wires, the
-  test pads and the net tie.
-- **Ready to order (2026-10-31):** nothing blocks it (`readiness.txt`: READY TO ORDER,
-  `dap-gerbers.zip`). Before ordering: pre-order 4 CS43131 into the JLCPCB parts inventory
-  (none in stock), and check the touch ribbon's contact side. History: on 2026-10-27 the
+  0.4 mm-pitch QFNs; HASL is too uneven for them); JLCPCB's free 6-layer stackup
+  JLC06121H-3313 (1.14 mm finished; the USB pairs are drawn for its 0.0994 mm outer prepreg);
+  tracks/gaps 0.1 mm; vias 0.5/0.3 mm, filled and capped (free on 6 layers); parts on the
+  top side only.
+- **No hole under 0.3 mm (2026-10-31):** KiCad's footprints have 0.2 mm thermal vias in the
+  chips' centre pads (both CS43131s, the TPS63001, the ESP32 module). 嘉立创 charged ¥229
+  more for them (small holes, plus a four-wire test and TG155 material it then requires), so
+  `make_pcb.py` widens them to 0.3 mm (`MIN_HOLE`), pads unchanged; DRC still clean.
+- **Not assembled by JLCPCB:** both headphone jacks (on the back, hand-soldered), the
+  battery wires, the test pads, the reset pads and the net tie.
+- **Ready to order (2026-10-31; files made again for board v0.2 on 2026-11-11):** nothing
+  blocks it (`readiness.txt`: READY TO ORDER, `dap-gerbers.zip`). Before ordering: pre-order 4 CS43131 into the JLCPCB parts inventory
+  (none in stock), and check the touch ribbon's contact side.
+- **Ordering through 嘉立创 (jlc-smt.com), JLC's site in China** (owner's choice, 2026-10-31):
+  it ships to the 集运 warehouse with the Taobao parcels. Its forms are in Chinese; the
+  steps, field by field with the English meaning, are at the end of `readiness.txt`. It reads
+  no KiCad files, so the assembly order takes `dap-bom-cn.csv` and `dap-cpl-cn.csv`, written
+  after its BOM rules (Comment, Designator, Footprint and the part number as 商品编号; plain
+  package names). Under 元器件备货方式 pick **嘉立创代采代购**: JLC buys every part,
+  including the CS43131 it doesn't stock; parts can also be bought ahead into its private
+  stock (私有库存). The board order goes in first, on member.jlc.com, and the assembly order
+  is attached to it once the board order has passed review. History: on 2026-10-27 the
   unrouted connections, stand-in footprints, missing LCSC numbers and open datasheet checks
   blocked it; all are done.
-- In JLCPCB's placement preview, check each part's rotation: some library parts are drawn
-  turned 90° or 180° from KiCad's footprints.
+- **Board order filled in on 嘉立创, not submitted (2026-10-31; paused 2026-11-01 at the
+  owner's request):** every field is in `readiness.txt`. Left to do: upload the zip with
+  the 0.3 mm holes (the one first uploaded had 0.2 mm), enter the 集运 address and contact,
+  then a final check and the owner's yes before 提交订单. Payment comes after their review
+  (手动确认订单). Then: approve their panel drawing and production files (2 rounds), and
+  place the assembly order.
+- **Rails (2026-10-31):** 嘉立创's assembly line takes boards of 70 × 70 mm or more, and
+  this one is 60.8 mm wide, so the boards come with 5 mm rails on the long edges (panel
+  7.08 × 11.18 cm, ¥30 for their engineer to draw it). Mouse-bite tabs, not V-cut: the
+  ESP32 module is flush with the left edge and the side keys are 0.3 mm from both long
+  edges; the tabs keep clear of them (the note sent with the order is in `readiness.txt`).
+  Snap the rails off and file the tab stubs flat before the board goes into the case, or
+  pay ¥10 + ¥2 a board for 嘉立创 to do it.
+- **Assembly type: standard (标准型), not economic.** 嘉立创 doesn't put ESP32 modules on
+  its economic line (255 °C reflow); standard needs the rails above. With about 25
+  extended part types it is the cheaper one anyway: ¥150 setup + ¥50 stencil + ¥8 a type,
+  against ¥50 + ¥20 a type (fee table on jlc-smt.com, 2026-10-31).
+- **Cost (2026-10-31):** boards ¥378.22 (quoted: setup 200, ENIG 105.54, rails 30, board
+  29.68, quality cover 10, file approval 3; shipping free). Estimated: assembly of 2 boards
+  about ¥420, their parts about ¥470 (prices in the parts list), so about ¥1,280 CNY in
+  all. Assembling one board instead of two would save about ¥235.
+- **Rotations (2026-11-11):** JLCPCB turns and places its own footprint for each part, and
+  many are drawn turned 90° or 180° from KiCad's, even two parts in the same package (its two
+  SOT-23-6 footprints differ). `tools/jlc_turns.py` fetches JLCPCB's footprint for every LCSC
+  number from EasyEDA, lays KiCad's pads over it and writes the turn and the middle of the
+  pads to `tools/jlc_turns.json`; `make_jlc.py` puts both into the placement files. Run it
+  again whenever a part or footprint changes. Before, the files had KiCad's own angles.
+  Still look at pin 1 of every chip in JLCPCB's placement preview before approving it.
 
 ## Finishing stages 3 and 4 (2026-10-31)
 
@@ -476,8 +542,8 @@ footprints already used, Murata BLM18KG601SN1D ferrite (1.3 A) on VP, Everlight 
 2026-10-31: every assembled part had some except the **CS43131 (0)**: pre-order 4 into the
 JLCPCB parts inventory before ordering. LCSC had only 40 of the 10 µH inductor.
 
-**Ordering:** JLCPCB makes at least 5 boards per order and assembles 2 or more of them
-(Economic assembly: 2–50 boards, one side, 2/4/6 layers, 0.8–1.6 mm). Order 5, assemble 2.
+**Ordering:** JLCPCB makes at least 5 boards per order and assembles 2 or more of them.
+Order 5, assemble 2 (standard assembly since 2026-10-31, see JLCPCB files).
 
 **Routing on 4 layers (2026-10-31): not finished.** Seven full runs (about an hour each) with
 the real parts left between 21 and 37 connections unrouted, always in the same places: the
@@ -508,4 +574,95 @@ short of room: they ran out of search steps, or a pin had been walled in. What f
   than it made. On the current board it isn't needed at all.
 - **Clean-up that can't cut a connection**, and a pin via that a track on another layer
   runs across counts as used (removing one had cut the charger's second SYS pin off).
-A full run now takes about 20 minutes.
+A full run took about 20 minutes on 2026-10-31 and about 10 on 2026-11-11.
+
+## Review, 2026-11-11 (board v0.2)
+
+A check of the whole design before the order goes in. KiCad's rule check, the netlist and
+the Gerbers agreed with the notes above. Checked against the makers' documents:
+
+- **CS43131** (Cirrus DS1155F2): all 40 pins of our symbol, every capacitor of the mono-mode
+  circuit (Fig. 2-2: FILT+ to VA, FILT− to −VA, 2.2 µF flying and filter capacitors, VP 0.1 +
+  4.7 µF), the address resistor (Table 4-12: 4.99 kΩ to ground = address bits 01), RESET and
+  INT in the VP domain, and the power order (5.2: VP first, as here, since VP is SYS). The
+  datasheet gives no input threshold for RESET, but its typical circuit drives it from a
+  processor on the 1.8 V I2C side, so the ESP32's 3.3 V is well above it; the limit that
+  applies is VP + 0.3 V (Table 3-2), see the firmware rules below.
+- **GL823K** (Genesys 1.03): all 16 pins; it needs no card-detect switch and no crystal.
+- **BQ24073** (TI SLUS810N): the timer, current-limit and EN1/EN2 settings as described under
+  Power tree; the timer is the one open point there.
+- **Every chip against JLCPCB's own symbol** for its LCSC number (pin number → name → our
+  net): the 15 chip types, the ESP32 module, the MOSFET and both diode types all agree.
+
+**Changed** (all in the scripts; the board was placed and routed again):
+
+1. **Reset pads `JP1`, on the back** between the battery pads and the 4.4 mm jack, marked
+   RST: pad 1 is the ESP32's EN, pad 2 ground. Bridge them for a moment with tweezers to
+   restart the ESP32; hold Play meanwhile to start the firmware download mode. The board has
+   no power switch, the battery is soldered and the BQ24073 has no SYSOFF pin, so before
+   this a hung ESP32 (no USB serial, for example after a brown-out reset with Play held,
+   which starts the download mode) could only be restarted by unsoldering the battery.
+   They are reached with the back cover off; never solder them shut.
+2. **The ESP32's capacitors at its 3.3 V pin.** C19 (10 µF) and C20 (100 nF) sat about
+   20 mm from pin 2, in the column right of the module; they and the EN parts (R7, C21) now
+   sit just below pins 1–3 (`AREA` of group U8 in `make_pcb.py`), 3–4 mm from the pin. The
+   other small parts of that column are pinned where they were (`PLACE`): packed afresh,
+   the I2C pull-ups landed against the module's pins and could not be routed.
+3. **CS43131 XTO to ground** on both chips, as Cirrus draws it for an external master clock
+   (Fig. 2-1, "External MCLK"); it was left open. Its neighbour is GNDD.
+4. **TPS63001 inductor 2.2 µH** (Cenker CKCS3015-2.2uH/M, C354563, 1.6 A, 60 mΩ), the value
+   of TI's circuit; it was 1.5 µH. Same footprint.
+5. **Placement files in JLCPCB's own rotations and positions** (`tools/jlc_turns.py`, see
+   JLCPCB files). The files of 2026-10-31 gave KiCad's own angles and positions: unless
+   JLCPCB's review had caught it, 14 parts would have been placed turned 90° or 180° (the
+   touch connector, the MOSFET, the three LDOs, the 5 V boost and its switch, the
+   USB protection, the USB switch, the card reader, the SD switch, both level shifters, the
+   inverter), and the ESP32 module 3.6 mm, the USB-C socket 1.6 mm and the e-paper
+   connector 0.65 mm off their pads. `jlc_turns.py --check` lays JLCPCB's footprint for
+   every row of the placement file on the board and measures each pad against the copper:
+   on the v0.2 files all 151 placed parts land within 0.21 mm of their pads (the rest is the
+   difference between the two footprints' pad shapes); the old placement file fails it for
+   those 17 parts (and for both inductors, which fit either way round).
+
+**Routing it again** took four runs, and two changes to the routing order (both in
+`make_pcb.py`, described under Routing):
+
+- With the ESP32's capacitors gone from the column beside the module, the column's other
+  parts packed differently and two I2C pull-up connections could not be made: they are
+  pinned to their old spots now.
+- Then one connection stayed open at a DAC each time. The cause was there on 2026-10-31
+  too: every pin got its via before any short net was routed, and at 0.4 mm pitch the via
+  of the 1.8 V pin (25) sits right beside the way out of the flying-capacitor pins (23, 24)
+  and of VP (26). A replay of the first steps showed FLYC_VCP failing at both DACs in the
+  first pass on the old board as well; it only finished because a later rip-up happened to
+  free it. Now the flying capacitors are routed before the pin vias (`FIRST`), and a pin that
+  finds no room for its via takes back its neighbours' (`YIELD_ALL`): every local net routes
+  in the first pass.
+- Freerouting ran as the fallback in two of the failed runs and made things worse (see
+  Routing, step 2); it is opt-in now. A fault found on the way: when Freerouting failed,
+  the clean-up and repair steps were skipped; they always run now.
+
+Result: all 125 nets routed by our own router (4 connections left after the first pass,
+none after one round of rip-ups), KiCad's rule check clean apart from the side keys' own
+footprint and four silkscreen notes as before, 394 vias, 3.5 m of track, no hole under
+0.3 mm, about 10 minutes a run. The case model takes the new board without clashes
+(`tools/make_case.py`: nothing reaches the panel, the battery or the back).
+
+**Firmware rules from the review** (for the CS43131 driver and the power code, not yet
+written):
+
+- **Never start the CS43131's crystal oscillator:** XTO is grounded. PDN_XTAL (register
+  0x20000, bit 3) is 1 (off) after reset and must stay 1. Cirrus's example sequences that
+  clear it ("Start XTAL") are for boards with a crystal; this board feeds MCLK from the
+  oscillators into XTI/MCLK.
+- **Hold the DACs in reset below about 3.3 V of battery:** on battery, VP is the battery
+  voltage (SYS), the CS43131 needs VP ≥ 3.0 V (3.3 V with HV_EN = 1), and RESET's 3.3 V high
+  must not go above VP + 0.3 V. Pull DAC_RST low first, then turn AUDIO_EN off (5.2: the
+  1.8 V rails may go only after RESET).
+
+**Left as it is, for the owner to decide:** the charge safety timer (see Power tree).
+
+**Not checked here:** the two jack footprints against real parts (print the board 1:1 and
+lay the Kinghelm jack on it when it arrives), and the touch ribbon's contact side and pin-1
+end (look at the panel).
+
