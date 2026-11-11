@@ -296,15 +296,6 @@
   "fit": 0.108,
   "by": "number"
  },
- "C354542": {
-  "footprint": "L_Cenker_CKCS252010",
-  "jlc": "IND-SMD_L2.5-W2.0_FNR252012S",
-  "turn": 180,
-  "dx": 0.0,
-  "dy": 0.0,
-  "fit": 0.013,
-  "by": "number"
- },
  "C354563": {
   "footprint": "L_Cenker_CKCS3015",
   "jlc": "IND-SMD_L3.0-W3.0",
@@ -312,15 +303,6 @@
   "dx": 0.0,
   "dy": 0.0,
   "fit": 0.15,
-  "by": "number"
- },
- "C354566": {
-  "footprint": "L_Cenker_CKCS3015",
-  "jlc": "IND-SMD_L3.0-W3.0-1",
-  "turn": 0,
-  "dx": 0.0,
-  "dy": -0.0,
-  "fit": 0.1,
   "by": "number"
  },
  "C36871": {
@@ -339,6 +321,15 @@
   "dx": -0.0,
   "dy": 0.0,
   "fit": 0.077,
+  "by": "number"
+ },
+ "C435392": {
+  "footprint": "L_1008_2520Metric",
+  "jlc": "L2520",
+  "turn": 0,
+  "dx": -0.0,
+  "dy": 0.0,
+  "fit": 0.093,
   "by": "number"
  },
  "C443721": {
@@ -474,6 +465,15 @@
   "dx": -0.0,
   "dy": 0.0,
   "fit": 0.05,
+  "by": "number"
+ },
+ "C98364": {
+  "footprint": "L_Changjiang_FNR4020S",
+  "jlc": "IND-SMD_L4.0-W4.0",
+  "turn": 0,
+  "dx": -0.0,
+  "dy": 0.0,
+  "fit": 0.1,
   "by": "number"
  }
 }

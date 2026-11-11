@@ -5,3 +5,5 @@
 (rule "hole size" (constraint hole_size (min 0.3mm)))
 (rule "hole clearance" (constraint hole_clearance (min 0.2mm)))
 (rule "edge clearance" (constraint edge_clearance (min 0.3mm)))
+# The 4.4 mm jack's own pads beside its relief cut-out: JLCPCB's minimum for copper at a routed edge
+(rule "jack cut-out" (condition "A.memberOfFootprint('J7')") (constraint edge_clearance (min 0.2mm)))

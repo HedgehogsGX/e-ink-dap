@@ -40,7 +40,9 @@ R0402, C0402 = "Resistor_SMD:R_0402_1005Metric", "Capacitor_SMD:C_0402_1005Metri
 R0603 = "Resistor_SMD:R_0603_1608Metric"
 C0603, C0805 = "Capacitor_SMD:C_0603_1608Metric", "Capacitor_SMD:C_0805_2012Metric"
 FB0603 = "Inductor_SMD:L_0603_1608Metric"
-L3015, L2520 = "Inductor_SMD:L_Cenker_CKCS3015", "Inductor_SMD:L_Cenker_CKCS252010"
+L3015 = "Inductor_SMD:L_Cenker_CKCS3015"
+L1008 = "Inductor_SMD:L_1008_2520Metric"        # 2.5 x 2.0 mm: Murata DFE252012F, pads as JLCPCB's within 0.1 mm
+L4020 = "Inductor_SMD:L_Changjiang_FNR4020S"    # 4 x 4 mm: Sunlord WPN4020H, pads as JLCPCB's within 0.1 mm
 
 
 class Part:
@@ -50,7 +52,10 @@ class Part:
         self.ref = None
 
 
-# LCSC part numbers for the passives, by (value, footprint), checked on lcsc.com 2026-10-31.
+# LCSC part numbers for the passives, by (value, footprint), checked on lcsc.com 2026-10-31. The 1 uH and
+# 10 uH inductors were replaced on 2026-11-12 (JLCPCB parts data): 1 uH Murata DFE252012F-1R0M=P2, 4.7 A
+# saturation (TI's worst case for the 5 V boost is about 2.2 A); 10 uH Sunlord WPN4020H100MT, 3.5 A saturation,
+# 2.0 A rated (Good Display's reference circuit asks for "10uH 1A")
 # Resistors UNI-ROYAL 1 %; capacitors Samsung X5R/X7R rated at least 3x their voltage
 # (1 uF/50V and 4.7 uF/50V for the e-paper booster, whose rails reach +-20 V).
 PASSIVES = {
@@ -63,7 +68,7 @@ PASSIVES = {
     ("100nF", C0402): "C1525", ("1uF", C0402): "C52923", ("1uF", C0603): "C15849",
     ("1uF/50V", C0603): "C15849", ("2.2uF", C0603): "C23630", ("4.7uF", C0603): "C19666",
     ("10uF", C0805): "C15850", ("22uF", C0805): "C45783", ("4.7uF/50V", C0805): "C98192",
-    ("2.2uH", L3015): "C354563", ("10uH", L3015): "C354566", ("1uH", L2520): "C354542",
+    ("2.2uH", L3015): "C354563", ("10uH", L4020): "C98364", ("1uH", L1008): "C435392",
     ("600R@100MHz", FB0603): "C85833",
 }
 
@@ -231,7 +236,7 @@ def power_sheet():
             Part("dap", "dap:TPS61023", "TPS61023DRLR",
                  {"VIN": "SYS", "SW": "BST_SW", "EN": "BOOST_EN", "GND": "GND", "VOUT": "5V_BOOST",
                   "FB": "BST_FB"}, lcsc="C919459"),
-            L("1uH", "SYS", "BST_SW", L2520), R("768k", "5V_BOOST", "BST_FB"), R("100k", "BST_FB", "GND"),
+            L("1uH", "SYS", "BST_SW", L1008), R("768k", "5V_BOOST", "BST_FB"), R("100k", "BST_FB", "GND"),
             C("10uF", "SYS"), C("22uF", "5V_BOOST"), C("22uF", "5V_BOOST"),
             Part("dap", "dap:TPS2553", "TPS2553DBVR",
                  {"IN": "5V_BOOST", "EN": "BOOST_EN", "ILIM": "SW_ILIM", "GND": "GND", "OUT": "VBUS"},
@@ -288,29 +293,30 @@ def mcu_sheet():
 
 
 def display_sheet():
-    fpc = {"1": None, "2": "EPD_GDR", "3": "EPD_RESE", "4": "EPD_VGL", "5": "EPD_VGH", "6": None, "7": None,
+    # Pin names as in the GDEY037T03 spec's pin table (25.01.08, p. 7); pins 1 and 4 NC, "keep open"
+    fpc = {"1": None, "2": "EPD_GDR", "3": "EPD_RESE", "4": None, "5": "EPD_VSH2", "6": None, "7": None,
            "8": "GND", "9": "EPD_BUSY", "10": "EPD_RST", "11": "EPD_DC", "12": "EPD_CS", "13": "EPD_SCK",
            "14": "EPD_MOSI", "15": "+3V3", "16": "+3V3", "17": "GND", "18": "EPD_VDD", "19": None,
-           "20": "EPD_VSH", "21": "EPD_PREVGH", "22": "EPD_VSL", "23": "EPD_PREVGL", "24": "EPD_VCOM"}
+           "20": "EPD_VSH1", "21": "EPD_VGH", "22": "EPD_VSL", "23": "EPD_VGL", "24": "EPD_VCOM"}
     c50 = lambda net: C("1uF/50V", net, fp=C0603)  # noqa: E731
     return [
-        ("E-paper GDEY037T03 (UC8253), 24-pin FPC: the reference circuit in the GDEY037T03-T02 spec (p. 35), 0.47 R sense for UC driver ICs. BS1 low = 4-wire SPI", [
+        ("E-paper GDEY037T03 (UC8253), 24-pin FPC: the reference circuit in the GDEY037T03 spec (25.01.08, p. 35), 0.47 R sense for UC driver ICs. BS1 low = 4-wire SPI", [
             Part("J", "Connector_Generic:Conn_01x24", "E-paper FPC",
                  {k: v for k, v in fpc.items() if v}, "Connector_FFC-FPC:Jushuo_AFC07-S24FCA-00_1x24-1MP_P0.50_Horizontal",
                  "C262567", nc=[k for k, v in fpc.items() if not v],
-                 note="pin 1 NC, 6/7 temperature sensor I2C unused, 19 VPP (test pin) left open as in the "
-                      "reference circuit. Bottom contact: the ribbon's gold faces the display and turns "
+                 note="pins 1 and 4 NC and left open, 6/7 temperature sensor I2C unused, 19 VPP (test pin) open, "
+                      "as in the spec's reference circuit. Bottom contact: the ribbon's gold faces the display and turns "
                       "towards the board when folded under the panel"),
-            L("10uH", "+3V3", "EPD_SW", L3015), C("4.7uF/50V", "+3V3", fp=C0805),
+            L("10uH", "+3V3", "EPD_SW", L4020), C("4.7uF/50V", "+3V3", fp=C0805),
             Part("Q", "Transistor_FET:Q_NMOS_GSD", "Si1308EDL", {"G": "EPD_GDR", "S": "EPD_RESE", "D": "EPD_SW"},
                  "Package_TO_SOT_SMD:SOT-323_SC-70", "C469327"),
             R("1M", "EPD_GDR", "GND", fp=R0603), R("0.47", "EPD_RESE", "GND", fp=R0603),
-            Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_SW", "K": "EPD_PREVGH"}, "Diode_SMD:D_SOD-123", "C77336"),
+            Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_SW", "K": "EPD_VGH"}, "Diode_SMD:D_SOD-123", "C77336"),
             Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_NEG", "K": "GND"}, "Diode_SMD:D_SOD-123", "C77336"),
-            Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_PREVGL", "K": "EPD_NEG"}, "Diode_SMD:D_SOD-123", "C77336"),
+            Part("D", "Device:D_Schottky", "MBR0530", {"A": "EPD_VGL", "K": "EPD_NEG"}, "Diode_SMD:D_SOD-123", "C77336"),
             C("4.7uF/50V", "EPD_SW", "EPD_NEG", fp=C0805),
-            c50("EPD_VGL"), c50("EPD_VGH"), c50("+3V3"), c50("EPD_VDD"), c50("EPD_VSH"),
-            c50("EPD_PREVGH"), c50("EPD_VSL"), c50("EPD_PREVGL"), c50("EPD_VCOM"),
+            c50("EPD_VSH2"), c50("+3V3"), c50("EPD_VDD"), c50("EPD_VSH1"),
+            c50("EPD_VGH"), c50("EPD_VSL"), c50("EPD_VGL"), c50("EPD_VCOM"),
         ]),
         ("Touch FT6336U, 6-pin FPC (Good Display TP037-S02: 1 GND, 2 VDD, 3 RST, 4 INT, 5 SDA, 6 SCL), I2C address 0x38", [
             Part("J", "Connector_Generic:Conn_01x06", "Touch FPC",
