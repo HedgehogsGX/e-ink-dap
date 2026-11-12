@@ -370,10 +370,10 @@ of the same script, so everything is redone whenever the schematic or the placem
   free stackup JLC06121H-3313), then on to the
   card reader and the ESP32. The socket's two D− pins straddle a D+ pin, so they are
   joined on the bottom layer. CC1/CC2 to the TUSB320L. Pair lengths (track copper, board
-  v0.2): 70/77 mm from the socket to the switch, the bridge between the socket's D− pins
-  included (6.5 mm apart; 4.6 on the board of 2026-10-31), then 18/17 mm on to the card
-  reader, D+ the longer, so the card reader's whole high-speed path is about 5 mm apart,
-  about 30 ps: more than USB 2.0 layout guides like (about 4 mm), small next to a 2 ns bit.
+  v0.3): 69/74 mm from the socket to the switch, the bridge between the socket's D− pins
+  included (4.6 mm apart, as on the board of 2026-10-31; 6.5 on v0.2), then 18/17 mm on to
+  the card reader, D+ the longer, so the card reader's whole high-speed path is about 3 mm
+  apart, under 20 ps: inside what USB 2.0 layout guides like (about 4 mm).
   9/11 mm to the ESP32, whose USB is full speed only.
 - **Audio:** master clock (kept 0.2 mm from other nets), the four headphone outputs
   (0.3 mm wide where there is room), headphone ground (0.5 mm) to both jacks and the net
@@ -710,15 +710,16 @@ wrong package's column, and two downloaded drawings swapped.
 **Four findings, fixed in board v0.3:**
 
 1. **L2, the 5 V boost's 1 µH inductor:** the Cenker CKCS252010 (1.85 A saturation) failed
-   TI's worst-case check (TPS61023 datasheet 8.2.2.2: 3.0 V in, 5.29 V out, the port's
-   0.57 A, inductance −30 % gives about 2.16 A peak). Now a Murata DFE252012F-1R0M=P2
-   (C435392: 4.7 A saturation, 3.3 A rated, 40 mΩ) on KiCad's 1008 footprint, whose pads sit
-   within 0.1 mm of JLCPCB's for this part.
+   TI's worst-case check (TPS61023 datasheet 8.2.2.2: 3.0 V in, 5.29 V out, inductance
+   −30 %, and the port's current limit, up to 0.62 A with the 47 kΩ on the TPS2553: about
+   2.3 A peak). Now a Murata DFE252012F-1R0M=P2 (C435392: 4.7 A saturation, 3.3 A rated,
+   40 mΩ) on KiCad's 1008 footprint, whose pads sit within 0.1 mm of JLCPCB's for this part.
 2. **L3, the e-paper booster's 10 µH inductor:** the Cenker CKCS3015 was rated 0.77 A
    (0.72 A saturation), and the reference circuit asks for "10uH 1A(Max)". No 10 µH part of
-   3 × 3 mm reaches that, so it is now a 4 × 4 × 2 mm Sunlord WPN4020H100MT (C98364: 3.5 A
-   saturation, 2.0 A rated) on the Changjiang FNR4020S footprint (pads within 0.1 mm of
-   JLCPCB's).
+   3 × 3 mm reaches that, so it is now a 4 × 4 × 2 mm Sunlord WPN4020H100MT (C98364: 2.0 A
+   rated; saturation 2.8 A guaranteed, 3.5 A typical; 216 mΩ at most) on KiCad's Changjiang
+   FNR4020S footprint, whose pads (1.1 × 3.7 mm, 1.9 mm apart) are exactly the land pattern
+   in Sunlord's datasheet (WPN series, 2023-06-01) and sit within 0.1 mm of JLCPCB's.
 3. **C25 on e-paper pin 4:** the spec marks pin 4 "NC, keep open"; the board had a 1 µF
    capacitor there, because the pin names had come from another Good Display panel family.
    That capacitor is gone, pin 4 is open, and the e-paper nets carry the spec's names (VSH2,
@@ -762,4 +763,30 @@ the board and the 22.96 mm² cut-out. The case model takes the board without cla
 **Still not checked:** which side of each ribbon carries the contacts; the oscillators'
 pinout (KiCad's and JLCPCB's libraries agree); the e-paper booster's real peak current (set by
 the UC8253, not in the panel spec; the new inductor is rated well above the reference's 1 A).
+
+**Checked again on 2026-11-13,** by rebuilding everything from the committed scripts in a
+separate copy and reading the makers' documents afresh:
+
+- **The files are what the scripts make:** the regenerated schematic has the same netlist
+  (157 parts, 124 nets); the rebuilt board has the same parts, pads, tracks, vias, zones and
+  outline as `hardware/dap.kicad_pcb`; BOM, placement files and `readiness.txt` come out
+  byte for byte, the drill files and outline likewise, and the copper Gerbers object for
+  object (the filled areas differ by less than 0.000001 mm²).
+- **Only the intended changes:** the netlist of v0.2 against v0.3, pin by pin: one capacitor
+  gone, two inductors changed, five e-paper nets renamed, pin 4 open. Nothing else.
+- **The four fixes against the documents:** Murata's data sheet for L2 (4.7 A, 3.3 A, 40 mΩ);
+  Sunlord's for L3 (ratings and land pattern, corrected above); Good Display's pin table and
+  reference circuit, read connection by connection; Kinghelm's drawing for every pad and
+  every dimension of the cut-out (9.00, 17.70, 2.10, 1.50, 2.95, 13.25, 14.80 mm), with the
+  jack's pads 10, 11 and 12 measured 0.20, 0.22 and 0.21 mm from the cut on the board.
+- **The firmware rules against Cirrus's DS1155F2:** XTO is drawn grounded for an external
+  clock (Fig. 4-13); PDN_XTAL is bit 3 of 0x20000 and 1 after reset (7.1.10); RESET is a
+  VP-domain pin, allowed up to VP + 0.3 V (Table 3-2); VP 3.0 V at least, 3.3 V with
+  HV_EN = 1; the 1.8 V rails may go once RESET is asserted, VP last (5.2).
+- Rule checks, schematic parity and `jlc_turns.py --check` give the results above again.
+
+Two figures in the notes were off and are corrected above: L3's saturation current was
+given as 3.5 A, its typical value (2.8 A is guaranteed), and L2's worst case as 2.16 A, with
+the port limit of a 49.9 kΩ resistor (0.57 A) where the board has 47 kΩ (0.62 A). Neither
+changes a part or the board.
 

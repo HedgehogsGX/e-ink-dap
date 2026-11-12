@@ -54,8 +54,8 @@ class Part:
 
 # LCSC part numbers for the passives, by (value, footprint), checked on lcsc.com 2026-10-31. The 1 uH and
 # 10 uH inductors were replaced on 2026-11-12 (JLCPCB parts data): 1 uH Murata DFE252012F-1R0M=P2, 4.7 A
-# saturation (TI's worst case for the 5 V boost is about 2.2 A); 10 uH Sunlord WPN4020H100MT, 3.5 A saturation,
-# 2.0 A rated (Good Display's reference circuit asks for "10uH 1A")
+# saturation (TI's worst case for the 5 V boost is about 2.3 A); 10 uH Sunlord WPN4020H100MT, 2.0 A rated,
+# saturation 2.8 A guaranteed and 3.5 A typical (Good Display's reference circuit asks for "10uH 1A")
 # Resistors UNI-ROYAL 1 %; capacitors Samsung X5R/X7R rated at least 3x their voltage
 # (1 uF/50V and 4.7 uF/50V for the e-paper booster, whose rails reach +-20 V).
 PASSIVES = {
