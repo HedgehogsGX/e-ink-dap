@@ -147,7 +147,10 @@ AREA = [
     ("U13", (4.5, -39.8, 27.0, -23.0)),
     ("J5", (4.5, -39.8, 27.0, -23.0)),
 ]
-TARGETS = {"R8": ["U8"], "R16": ["U8"]}   # groups with no IC of their own sit by the ESP32
+TARGETS = {"R8": ["U8"], "R16": ["U8"],   # groups with no IC of their own sit by the ESP32
+           # each key's pull-up by its own key. Aimed at the group's placed parts, the Vol keys'
+           # pull-ups went for the other pull-ups' +3V3 pads too and landed mid-board (until 2026-11-12)
+           "SW1": ["SW1", "SW2", "SW3", "SW4"]}
 # Strips beside a chip kept free of small parts, where its routed pins leave: (x0, y0, x1, y1)
 # from the chip's centre. CS43131 (turned 180 degrees): headphone pins on top, I2S and clock
 # below. Its sides are left to the charge-pump and filter capacitors.
@@ -208,7 +211,11 @@ SWITCHING = ["BB_L1", "BB_L2", "BST_SW", "EPD_SW"]   # no vias of their own on t
 # Their pins 23 and 24 sit between two pins that get vias (22 and 25, 0.4 mm away); with the
 # vias in first, the 1.8 V pin's via walled FLYP_VCP in at its pin, and the board only finished
 # when a later rip-up happened to free it (2026-11-11: at the right DAC it no longer did)
-FIRST = ["DACL_FLYP_VCP", "DACR_FLYP_VCP", "DACL_FLYC_VCP", "DACR_FLYC_VCP"]
+FIRST = ["DACL_FLYP_VCP", "DACR_FLYP_VCP", "DACL_FLYC_VCP", "DACR_FLYC_VCP",
+         # and two lines that board v0.3 (2026-11-12) left unrouted when routed in their turn:
+         # the 5 V boost's enable (U6 pin 2) and the I2C level shifter's VREF2/EN line to its
+         # filter capacitor, 10 mm away (FIRST nets may be local or longer ones)
+         "BOOST_EN", "I2C_VREF2"]
 LOCAL_PIN_VIAS = True   # the short local nets' pins get vias too, where room is left
 # A pin of a longer net that finds no room for its via has its neighbours' vias taken back as
 # well, so both leave side by side on the top layer: at the left DAC the 1.8 V pin's via sat
@@ -279,23 +286,84 @@ DRC_RULES = """(version 1)
 (rule "hole size" (constraint hole_size (min 0.3mm)))
 (rule "hole clearance" (constraint hole_clearance (min 0.2mm)))
 (rule "edge clearance" (constraint edge_clearance (min 0.3mm)))
+# The 4.4 mm jack's own pads beside its relief cut-out: JLCPCB's minimum for copper at a routed edge
+(rule "jack cut-out" (condition "A.memberOfFootprint('J7')") (constraint edge_clearance (min 0.2mm)))
 """
+
+
+def _meet(a0, a1, b0, b1):
+    """Where the line through a0, a1 meets the line through b0, b1 (a1 if they are parallel)."""
+    (x1, y1), (x2, y2), (x3, y3), (x4, y4) = a0, a1, b0, b1
+    d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if abs(d) < 1e-12:
+        return a1
+    t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / d
+    return x1 + t * (x2 - x1), y1 + t * (y2 - y1)
+
+
+def _area(poly):
+    return sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(poly, poly[1:] + poly[:1])) / 2
+
+
+def grown(poly, d):
+    """The polygon moved d mm outwards on every side, corners mitred."""
+    sgn = 1 if _area(poly) > 0 else -1
+    lines = []
+    for (x0, y0), (x1, y1) in zip(poly, poly[1:] + poly[:1]):
+        length = math.hypot(x1 - x0, y1 - y0)
+        nx, ny = sgn * (y1 - y0) / length, -sgn * (x1 - x0) / length
+        lines.append(((x0 + nx * d, y0 + ny * d), (x1 + nx * d, y1 + ny * d)))
+    return [_meet(*lines[i - 1], *lines[i]) for i in range(len(lines))]
+
+
+def rounded(poly, r, steps=6):
+    """The polygon with its convex corners rounded to radius r (a router bit can't cut them sharp);
+    the concave ones stay sharp."""
+    sgn = 1 if _area(poly) > 0 else -1
+    out = []
+    for i, p in enumerate(poly):
+        a, b = poly[i - 1], poly[(i + 1) % len(poly)]
+        u = ((p[0] - a[0]) / math.dist(a, p), (p[1] - a[1]) / math.dist(a, p))
+        v = ((b[0] - p[0]) / math.dist(p, b), (b[1] - p[1]) / math.dist(p, b))
+        if (u[0] * v[1] - u[1] * v[0]) * sgn <= 0:
+            out.append(p)
+            continue
+        half = math.acos(max(-1.0, min(1.0, -(u[0] * v[0] + u[1] * v[1])))) / 2   # half the inside angle
+        bis = (v[0] - u[0], v[1] - u[1])
+        n = math.hypot(*bis)
+        c = (p[0] + bis[0] / n * r / math.sin(half), p[1] + bis[1] / n * r / math.sin(half))
+        t0 = (p[0] - u[0] * r / math.tan(half), p[1] - u[1] * r / math.tan(half))
+        t1 = (p[0] + v[0] * r / math.tan(half), p[1] + v[1] * r / math.tan(half))
+        a0, a1 = math.atan2(t0[1] - c[1], t0[0] - c[0]), math.atan2(t1[1] - c[1], t1[0] - c[0])
+        da = (a1 - a0 + math.pi) % (2 * math.pi) - math.pi
+        out += [(c[0] + r * math.cos(a0 + da * k / steps), c[1] + r * math.sin(a0 + da * k / steps))
+                for k in range(steps + 1)]
+    return [(round(x, 4), round(y, 4)) for x, y in out]
+
+
+# The plug switch's relief cut-out under the 4.4 mm jack, from Kinghelm's drawing ("紫色区域开孔(避位孔)":
+# 2.10 mm wide from 9.00 mm, widening to 2.95 mm from the axis between 13.25 and 14.80 mm, then a
+# slanted edge to 1.50 mm at the top, 17.70 mm; footprint frame, x positive towards pins 1-5). Two edges
+# stay back from the drawing so that pads 11 and 10 keep JLCPCB's 0.2 mm from the cut: the step at 2.89
+# (drawn 2.95) and the slant's foot at 1.95 (drawn about 1.99). Until 2026-11-12 the cut-out was about 0.3 mm
+# smaller than drawn on three sides, to keep this board's general 0.3 mm edge clearance.
+KH44_CUT = [(1.05, 9.00), (1.05, 17.70), (-1.50, 17.70), (-1.95, 14.80), (-2.89, 14.80), (-2.89, 13.25),
+            (-1.05, 13.25), (-1.05, 9.00)]
 
 
 def kh44_footprint():
     """Kinghelm KH-PJ-44002-12DBAP-A, 4.4 mm balanced jack, from its drawing (LCSC C42396781).
     Origin on the jack's axis at its front face, nose towards -y, drawn as if on the top side
-    (it is placed on the back). Legs are 0.55 mm slots; the drawing's clearance cut-out for the
-    plug switch is cut through the board, with a keep-out 0.2 mm around it for the routers."""
+    (it is placed on the back). Legs are 0.55 mm slots; the drawing's relief cut-out for the
+    plug switch (KH44_CUT, corners rounded 0.3 mm as drawn) is cut through the board, with a
+    keep-out 0.25 mm around it for the routers."""
     legs = [("1", 1.75), ("2", 4.75), ("3", 7.75), ("4", 10.75)]
     tht = [(n, 2.725, y, 0.95, 2.15, 0.55, 1.75) for n, y in legs] + \
           [(str(int(n) + 5), -2.725, y, 0.95, 2.15, 0.55, 1.75) for n, y in legs] + \
           [("5", 2.525, 14.70, 0.95, 1.95, 0.55, 1.55), ("10", -2.525, 16.00, 0.95, 1.95, 0.55, 1.55),
            ("11", -3.575, 12.95, 0.95, 1.95, 0.55, 1.55), ("12", 0.0, 18.38, 1.95, 0.95, 1.55, 0.55)]
-    cut = [(1.05, 9.0), (-1.05, 9.0), (-1.05, 13.3), (-2.6, 13.3), (-2.6, 14.5), (-1.6, 14.5), (-1.6, 17.45),
-           (1.05, 17.45)]
-    keep = [(1.25, 8.8), (-1.25, 8.8), (-1.25, 13.1), (-2.8, 13.1), (-2.8, 14.7), (-1.8, 14.7), (-1.8, 17.65),
-            (1.25, 17.65)]
+    cut = rounded(KH44_CUT, 0.3)
+    keep = [(round(x, 4), round(y, 4)) for x, y in grown(KH44_CUT, 0.25)]
     return dict(name="Jack_4.4mm_KH-PJ-44002-12DBAP-A", attr="through_hole", tht=tht, cutout=cut, keepout=keep,
                 descr="Kinghelm KH-PJ-44002-12DBAP-A 4.4 mm 5-pole jack, 12 pins: 1/6 ground, 2/7 R-, 3/8 R+, "
                       "4/9 L-, 5/10 L+, 11/12 plug switch; axis 2.5 mm above its seat, 2.8 mm nose",
@@ -693,7 +761,7 @@ def build():
             placed.add(ref)
 
     title = pcbnew.PCB_TEXT(board)
-    title.SetText("E-ink DAP  v0.2\n2026-11-11")
+    title.SetText("E-ink DAP  v0.3\n2026-11-12")
     title.SetLayer(pcbnew.B_SilkS)
     title.SetMirrored(True)
     title.SetTextSize(pcbnew.VECTOR2I(mm(1.6), mm(1.6)))
@@ -768,7 +836,7 @@ def route(board, nets):
     print(f"route: {stubs} fine-pitch pins given an escape stub")
     if not r.bridge(code[USB_C_BRIDGE[0]], USB_C_BRIDGE[1]):
         print("    no room to bridge the USB-C D- pins")
-    first = [(code[n], dict(opts)) for names, opts in local for n in names if n in FIRST]
+    first = [(code[n], dict(opts)) for names, opts in local + far for n in names if n in FIRST]
     stuck_first = sum(r.route_net(net, **opts) for net, opts in first)
     print(f"route: {len(first)} nets routed before the pin vias (FIRST), {stuck_first} connections not made")
     # A via for each stubbed pin (not on the USB pairs, which stay on the outer layers, nor the

@@ -55,7 +55,7 @@ TURNS = os.path.join(ROOT, "tools", "jlc_turns.json")   # KiCad's footprints aga
 STANDIN = {}
 # Points to check before ordering or when the boards arrive (docs/pcb_plan.md)
 TO_CONFIRM = ["stock: JLCPCB had no CS43131-CNZR (C965907) on 2026-10-31 - pre-order 4 into your JLCPCB parts "
-              "inventory before the order; LCSC had only 40 of the 10 uH inductor (C354566)",
+              "inventory before the order",
               "touch ribbon: with the display facing up, its gold contacts must face up as well (like the "
               "e-paper ribbon's), so they face the bottom-contact connector once folded under the panel",
               "plug detect: the 3.5 mm jack's switch opens when a plug goes in, the 4.4 mm jack's is "

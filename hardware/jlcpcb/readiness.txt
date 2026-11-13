@@ -1,7 +1,7 @@
 READY TO ORDER
 
 Check before ordering, or when the boards arrive (docs/pcb_plan.md):
-  - stock: JLCPCB had no CS43131-CNZR (C965907) on 2026-10-31 - pre-order 4 into your JLCPCB parts inventory before the order; LCSC had only 40 of the 10 uH inductor (C354566)
+  - stock: JLCPCB had no CS43131-CNZR (C965907) on 2026-10-31 - pre-order 4 into your JLCPCB parts inventory before the order
   - touch ribbon: with the display facing up, its gold contacts must face up as well (like the e-paper ribbon's), so they face the bottom-contact connector once folded under the panel
   - plug detect: the 3.5 mm jack's switch opens when a plug goes in, the 4.4 mm jack's is unknown - the firmware sets HPDETECT_INV for each after a try
   - charge timer (owner's decision, docs/pcb_plan.md, Power tree): R3 = 68 k stops a charge after 6.8 to 11.3 h depending on the chip, and the 5000 mAh cell needs about 7.5 to 8.5 h at 0.8 A - leave it (re-plug if the LED blinks), charge at about 1 A, or tie TMR to ground
@@ -62,7 +62,7 @@ Not assembled by JLCPCB:
   - JP1: reset pads on the back: bare copper, bridged with tweezers to restart the ESP32
 
 Files: dap-gerbers.zip (16 files: dap-B_Cu.gbl, dap-B_Mask.gbs, dap-B_Paste.gbp, dap-B_Silkscreen.gbo, dap-Edge_Cuts.gm1, dap-F_Cu.gtl, dap-F_Mask.gts, dap-F_Paste.gtp, dap-F_Silkscreen.gto, dap-In1_Cu.g1, dap-In2_Cu.g2, dap-In3_Cu.g3, dap-In4_Cu.g4, dap-NPTH.drl, dap-PTH.drl, dap-job.gbrjob),
-dap-bom.csv and dap-bom-cn.csv (57 lines), dap-cpl.csv and dap-cpl-cn.csv (151 parts).
-Rotations and positions are for JLCPCB's own footprints (tools/jlc_turns.json): 16 parts
-are turned from KiCad's (J3, L1, L2, Q1, U3, U4, U5, U6, U7, U9, U11, U12, U13, U14, U15, U16). Still look at pin 1 of every chip in
+dap-bom.csv and dap-bom-cn.csv (57 lines), dap-cpl.csv and dap-cpl-cn.csv (150 parts).
+Rotations and positions are for JLCPCB's own footprints (tools/jlc_turns.json): 15 parts
+are turned from KiCad's (J3, L1, Q1, U3, U4, U5, U6, U7, U9, U11, U12, U13, U14, U15, U16). Still look at pin 1 of every chip in
 JLCPCB's placement preview before approving it.
